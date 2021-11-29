@@ -11,7 +11,7 @@ api = Api(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dodomin.db' 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True 
-app.config["JWT_SECRET_KEY"] = os.urandom(24).hex()  # Change this "super secret" with something else!
+app.config["JWT_SECRET_KEY"] = os.urandom(24).hex()
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30)
 
 db = SQLAlchemy(app) 
