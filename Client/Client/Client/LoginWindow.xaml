@@ -14,10 +14,10 @@
             </LinearGradientBrush>
         </Grid.Background>
         <Rectangle Stroke="Black" Margin="242,69,242,121" Fill="#FF9C9090"/>
-        <TextBox HorizontalAlignment="Center" Margin="0,143,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="250" Height="25" Background="#FFE0E0E0" TextAlignment="Left" FontSize="18" Visibility="Visible" Text="adam małysz"/>
+        <TextBox x:Name="loginBox" HorizontalAlignment="Center" Margin="0,143,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="250" Height="25" Background="#FFE0E0E0" TextAlignment="Left" FontSize="18" Visibility="Visible" Text="adam małysz"/>
         <Label Content="Zaloguj się&#xD;&#xA;" HorizontalAlignment="Center" Margin="0,74,0,0" VerticalAlignment="Top" FontSize="24"/>
-        <Button Content="Zaloguj się" HorizontalAlignment="Center" Margin="0,252,0,0" VerticalAlignment="Top" FontSize="18"/>
-        <PasswordBox HorizontalAlignment="Center" Margin="0,192,0,0" VerticalAlignment="Top" Width="250" Background="#FFE0E0E0" Height="25" IsEnabled="False" FontSize="18" Password="sads"/>
+        <Button Content="Zaloguj się" HorizontalAlignment="Center" Click="Button_Click" Margin="0,252,0,0" VerticalAlignment="Top" FontSize="18"/>
+        <PasswordBox x:Name="passBox" HorizontalAlignment="Center" Margin="0,192,0,0" VerticalAlignment="Top" Width="250" Background="#FFE0E0E0" Height="25" FontSize="18" Password="sads"/>
         <Label Content="ID" HorizontalAlignment="Left" Margin="275,119,0,0" VerticalAlignment="Top"/>
         <Label Content="Hasło" HorizontalAlignment="Left" Margin="275,168,0,0" VerticalAlignment="Top"/>
     </Grid>

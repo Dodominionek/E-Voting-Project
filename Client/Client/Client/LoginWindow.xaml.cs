@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using RestSharp;
 
 namespace Client
 {
@@ -22,6 +23,16 @@ namespace Client
         public LoginWindow()
         {
             InitializeComponent();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var request = new RestRequest("login",Method.POST);
+            request.RequestFormat = RestSharp.DataFormat.Json;      
+            request.AddBody(new HttpClient.User(loginBox.Text, passBox.Password));
+            //"http://" + apiAddress + ":" + apiPort + "//newtable";
+            var response = HttpClient.HttpClient.MakeRequest(request);
+
         }
     }
 }
