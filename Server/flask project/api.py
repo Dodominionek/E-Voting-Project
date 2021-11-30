@@ -354,6 +354,7 @@ api.add_resource(RegisterManager, '/signup')
 api.add_resource(UserManager, '/user')
 api.add_resource(LoginManager, '/login')
 api.add_resource(LogoutManager, '/logout')
+api.add_resource(VoteManager, '/vote')
 
 if __name__ == '__main__':
     try:
