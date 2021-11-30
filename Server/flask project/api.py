@@ -58,11 +58,11 @@ tokens_blacklist_schema =  TokenBlacklistSchema(many=True)
 class Voting(db.Model): 
     voting  = db.Table('voting',
     db.Column('id', db.Integer, primary_key=True),
-    db.Column('question', db.String(64)),
-    db.Column('answerA', db.String(64)),
-    db.Column('answerB', db.String(64)),
-    db.Column('answerC', db.String(64)),
-    db.Column('answerD', db.String(64)),
+    db.Column('question', db.String(256)),
+    db.Column('answerA', db.String(256)),
+    db.Column('answerB', db.String(256)),
+    db.Column('answerC', db.String(256)),
+    db.Column('answerD', db.String(256)),
     db.Column('status', db.String(64)),
     sqlite_autoincrement=True)
 
@@ -81,6 +81,28 @@ class VotingSchema(ma.Schema):
 
 voting_schema = VotingSchema() 
 votings_schema = VotingSchema(many=True)
+
+####### Vote ##############
+class Voting(db.Model): 
+    voting  = db.Table('voting',
+    db.Column('id', db.Integer, primary_key=True),
+    db.Column('question', db.String(64)),
+    db.Column('votingId', db.String(64)),
+    db.Column('userAnswer', db.String(64)),
+    sqlite_autoincrement=True)
+
+    def __init__(self, username, votingId, userAnswer):
+        self.username = username
+        self.votingId = votingId
+        self.userAnswer = userAnswer
+
+class VoteSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'username', 'votingId', 'userAnswer')
+        session = db.Session
+
+vote_schema = VoteSchema() 
+votes_schema = VoteSchema(many=True)
 
 ####### Vote ##############
 class Vote(db.Model): 
@@ -279,6 +301,74 @@ class LogoutManager(Resource):
         db.session.commit()
         return make_response(jsonify({ 'Message': 'Succesfully logout' }), 201)
 
+####### Voting Manager ##############
+class VotingManager(Resource):
+    @staticmethod
+    def get():
+        try: votingId = request.args['votingId']
+        except Exception as _: votingId = None
+
+        if not votingId:
+            votings = Voting.query.all()
+            return make_response(jsonify(votings_schema.dump(votings)), 200)
+        elif Voting.query.filter_by(votingId = votingId).first() != None:
+            voting = Voting.query.filter_by(votingId = votingId).first()
+            return make_response(jsonify(voting_schema.dump(voting)), 200)
+        else:
+            return make_response(jsonify({'Message': 'NOT FOUND'}), 404)
+                  
+    @staticmethod
+    def post():
+        try:
+            username = request.args['username']
+            question = request.args['question']
+            answerA = request.args['answerA']
+            answerB = request.args['answerB']
+            answerC = request.args['answerC']
+            answerD = request.args['answerD']
+        except Exception as _: 
+            username = None
+            question = None
+            answerA = None
+            answerB = None
+            answerC = None
+            answerD = None
+
+        if not username or question == None or answerA == None or answerB == None:
+            return make_response(jsonify({ 'Message': 'Must provide the proper data' }), 400)
+
+        user = User.query.filter_by(username = username).first()
+
+        if user == None:
+            return make_response(jsonify({ 'Message': 'User not exist!' }), 404)
+
+        voting = Voting(username, question, answerA, answerB, answerC, answerD, 'Created')
+
+        db.session.commit()
+        return make_response(jsonify({'Message': f'New Voting {voting.votingId} created.'}), 200)
+
+    @staticmethod
+    def delete():
+        try: 
+            username = request.args['username']
+            votingId = request.args['votingId']
+        except Exception as _: 
+            username = None
+            votingId = None
+
+        if not username or not votingId:
+            return make_response(jsonify({ 'Message': 'No such voting.' }), 400)
+
+        voting = Voting.query.filter_by(votingId = votingId).first()
+
+        if voting == None:
+            return make_response(jsonify({ 'Message': 'No such voting.' }), 404)
+        
+        db.session.delete(voting)
+        db.session.commit()
+
+        return make_response(jsonify({'Message': f'Voting {votingId} deleted.'}), 200)
+
 ####### VoteManager ##############
 class VoteManager(Resource):
     @staticmethod
@@ -354,6 +444,7 @@ api.add_resource(RegisterManager, '/signup')
 api.add_resource(UserManager, '/user')
 api.add_resource(LoginManager, '/login')
 api.add_resource(LogoutManager, '/logout')
+api.add_resource(VoteManager, '/voting')
 api.add_resource(VoteManager, '/vote')
 
 if __name__ == '__main__':
