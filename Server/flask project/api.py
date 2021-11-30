@@ -283,7 +283,7 @@ class LogoutManager(Resource):
 class VotingManager(Resource):
     @staticmethod
     def get():
-        try: votingId = request.args['votingId']
+        try: votingId = request.json['votingId']
         except Exception as _: votingId = None
 
         if not votingId:
@@ -298,12 +298,12 @@ class VotingManager(Resource):
     @staticmethod
     def post():
         try:
-            username = request.args['username']
-            question = request.args['question']
-            answerA = request.args['answerA']
-            answerB = request.args['answerB']
-            answerC = request.args['answerC']
-            answerD = request.args['answerD']
+            username = request.json['username']
+            question = request.json['question']
+            answerA = request.json['answerA']
+            answerB = request.json['answerB']
+            answerC = request.json['answerC']
+            answerD = request.json['answerD']
         except Exception as _: 
             username = None
             question = None
@@ -312,7 +312,7 @@ class VotingManager(Resource):
             answerC = None
             answerD = None
 
-        if not username or question == None or answerA == None or answerB == None:
+        if not username or not question or not answerA or not answerB:
             return make_response(jsonify({ 'Message': 'Must provide the proper data' }), 400)
 
         user = User.query.filter_by(username = username).first()
@@ -320,16 +320,16 @@ class VotingManager(Resource):
         if user == None:
             return make_response(jsonify({ 'Message': 'User not exist!' }), 404)
 
-        voting = Voting(username, question, answerA, answerB, answerC, answerD, 'Created')
+        voting = Voting(question, answerA, answerB, answerC, answerD, 'Created')
 
         db.session.commit()
-        return make_response(jsonify({'Message': f'New Voting {voting.votingId} created.'}), 200)
+        return make_response(jsonify({'Message': f'New Voting {voting.id} created.'}), 201)
 
     @staticmethod
     def delete():
         try: 
-            username = request.args['username']
-            votingId = request.args['votingId']
+            username = request.json['username']
+            votingId = request.json['votingId']
         except Exception as _: 
             username = None
             votingId = None
