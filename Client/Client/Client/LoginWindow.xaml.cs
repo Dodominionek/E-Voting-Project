@@ -11,7 +11,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using HttpClient;
 using RestSharp;
+using Newtonsoft.Json;
 
 namespace Client
 {
@@ -28,10 +30,19 @@ namespace Client
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             var request = new RestRequest("login",Method.POST);
-            request.RequestFormat = RestSharp.DataFormat.Json;      
-            request.AddBody(new HttpClient.User(loginBox.Text, passBox.Password));
-            //"http://" + apiAddress + ":" + apiPort + "//newtable";
+            request.RequestFormat = RestSharp.DataFormat.Json;
+            request.AddJsonBody(new User(loginBox.Text, passBox.Password));
             var response = HttpClient.HttpClient.MakeRequest(request);
+            if(!response.IsSuccessful)
+            {
+                incorrectLabel.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                incorrectLabel.Visibility = Visibility.Hidden;
+                var token = JsonConvert.DeserializeObject<Token>(response.Content);
+                Console.WriteLine(token);
+            }
 
         }
     }

@@ -17,10 +17,12 @@ namespace HttpClient
 {
     static class HttpClient
     {
-            public static RestClient restClient = new RestClient("127.0.0.1");
+            public static RestClient restClient = new RestClient("http://127.0.0.1:5000/");
             public static IRestResponse MakeRequest(RestRequest restRequest )
             {
-                return restClient.Execute(restRequest);
+
+                var result =restClient.Execute(restRequest);
+                return result;
             }
         /*
         public HttpClient()
