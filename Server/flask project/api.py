@@ -4,7 +4,7 @@ from flask_marshmallow import Marshmallow
 from flask_restful import Resource, Api
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt
 from datetime import timedelta, datetime
-import pytz, time, threading
+import pytz, time, threading, os
 
 app = Flask(__name__) 
 api = Api(app) 
@@ -53,6 +53,56 @@ class TokenBlacklistSchema(ma.Schema):
 
 token_blacklist_schema = TokenBlacklistSchema() 
 tokens_blacklist_schema =  TokenBlacklistSchema(many=True)
+
+####### Voting ##############
+class Voting(db.Model): 
+    voting  = db.Table('voting',
+    db.Column('id', db.Integer, primary_key=True),
+    db.Column('question', db.String(64)),
+    db.Column('answerA', db.String(64)),
+    db.Column('answerB', db.String(64)),
+    db.Column('answerC', db.String(64)),
+    db.Column('answerD', db.String(64)),
+    db.Column('status', db.String(64)),
+    sqlite_autoincrement=True)
+
+    def __init__(self, question, answerA, answerB, answerC, answerD, status):
+        self.question = question
+        self.answerA = answerA
+        self.answerB = answerB
+        self.answerC = answerC
+        self.answerD = answerD
+        self.status = status
+
+class VotingSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'question', 'answerA', 'answerB', 'answerC', 'answerD', 'status')
+        session = db.Session
+
+voting_schema = VotingSchema() 
+votings_schema = VotingSchema(many=True)
+
+####### Vote ##############
+class Vote(db.Model): 
+    voting  = db.Table('vote',
+    db.Column('id', db.Integer, primary_key=True),
+    db.Column('username', db.String(64)),
+    db.Column('votingId', db.String(64)),
+    db.Column('userAnswer', db.String(64)),
+    sqlite_autoincrement=True)
+
+    def __init__(self, username, votingId, userAnswer):
+        self.username = username
+        self.votingId = votingId
+        self.userAnswer = userAnswer
+
+class VoteSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'username', 'votingId', 'userAnswer')
+        session = db.Session
+
+vote_schema = VoteSchema() 
+votes_schema = VoteSchema(many=True)
     
 ################### RESOURCES #######################
 
@@ -228,6 +278,50 @@ class LogoutManager(Resource):
         db.session.add(TokenBlackList(jti=jti, expiration_time=exp_time))
         db.session.commit()
         return make_response(jsonify({ 'Message': 'Succesfully logout' }), 201)
+
+####### VoteManager ##############
+class VoteManager(Resource):
+    @staticmethod
+    def post():
+        try:
+            username = request.json['username']
+            votingId = request.json['votingId']
+            userAnswer = request.json['userAnswer']
+        except Exception as _:
+            username = None
+            votingId = None
+            userAnswer = None
+        
+        if None in [username, votingId, userAnswer]:
+            return make_response(jsonify({'Message': 'BAD_REQUEST'}), 400)
+        
+        voting = Voting.query.filter_by(votingId = votingId).first()
+
+        if voting is None:
+            return make_response(jsonify({'Message': f'Voting {votingId} not found.'}), 404)
+
+        try:
+            username = request.json['username']
+            votingId = request.json['votingId']
+            userAnswer = request.json['userAnswer']
+        except Exception as _:
+            username = None
+            votingId = None
+            userAnswer = None
+        
+        if None not in [username, votingId, userAnswer]:
+            voting =  Voting.query.filter_by(votingId = votingId).first()
+            if voting != None and userAnswer != None and username != None:
+                vote = Vote(username, votingId, userAnswer)
+                db.session.add(vote)
+                db.session.commit()
+                return make_response(jsonify({'Vote registered.'}), 201)
+            else:
+                return make_response(jsonify({'Message': 'Vote was not registered.'}), 400)
+        else:
+            return make_response(jsonify({'Message': 'BAD_REQUEST'}), 400)
+
+
 
 ####### Functions ##############
 
