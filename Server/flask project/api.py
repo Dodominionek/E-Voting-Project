@@ -83,32 +83,10 @@ voting_schema = VotingSchema()
 votings_schema = VotingSchema(many=True)
 
 ####### Vote ##############
-class Voting(db.Model): 
-    voting  = db.Table('voting',
+class Vote(db.Model): 
+    vote  = db.Table('vote',
     db.Column('id', db.Integer, primary_key=True),
     db.Column('question', db.String(64)),
-    db.Column('votingId', db.String(64)),
-    db.Column('userAnswer', db.String(64)),
-    sqlite_autoincrement=True)
-
-    def __init__(self, username, votingId, userAnswer):
-        self.username = username
-        self.votingId = votingId
-        self.userAnswer = userAnswer
-
-class VoteSchema(ma.Schema):
-    class Meta:
-        fields = ('id', 'username', 'votingId', 'userAnswer')
-        session = db.Session
-
-vote_schema = VoteSchema() 
-votes_schema = VoteSchema(many=True)
-
-####### Vote ##############
-class Vote(db.Model): 
-    voting  = db.Table('vote',
-    db.Column('id', db.Integer, primary_key=True),
-    db.Column('username', db.String(64)),
     db.Column('votingId', db.String(64)),
     db.Column('userAnswer', db.String(64)),
     sqlite_autoincrement=True)
@@ -444,7 +422,7 @@ api.add_resource(RegisterManager, '/signup')
 api.add_resource(UserManager, '/user')
 api.add_resource(LoginManager, '/login')
 api.add_resource(LogoutManager, '/logout')
-api.add_resource(VoteManager, '/voting')
+api.add_resource(VotingManager, '/voting')
 api.add_resource(VoteManager, '/vote')
 
 if __name__ == '__main__':
