@@ -86,7 +86,7 @@ votings_schema = VotingSchema(many=True)
 class Vote(db.Model): 
     vote  = db.Table('vote',
     db.Column('id', db.Integer, primary_key=True),
-    db.Column('question', db.String(64)),
+    db.Column('username', db.String(64)),
     db.Column('votingId', db.String(64)),
     db.Column('userAnswer', db.String(64)),
     sqlite_autoincrement=True)
@@ -322,8 +322,9 @@ class VotingManager(Resource):
 
         voting = Voting(question, answerA, answerB, answerC, answerD, 'Created')
 
+        db.session.add(voting)
         db.session.commit()
-        return make_response(jsonify({'Message': f'New Voting {voting.id} created.'}), 201)
+        return make_response(jsonify({'Message': f'New Voting {question} created.', 'id': voting.id}), 201)
 
     @staticmethod
     def delete():
@@ -337,7 +338,7 @@ class VotingManager(Resource):
         if not username or not votingId:
             return make_response(jsonify({ 'Message': 'No such voting.' }), 400)
 
-        voting = Voting.query.filter_by(votingId = votingId).first()
+        voting = Voting.query.filter_by(id = votingId).first()
 
         if voting == None:
             return make_response(jsonify({ 'Message': 'No such voting.' }), 404)
@@ -363,7 +364,7 @@ class VoteManager(Resource):
         if None in [username, votingId, userAnswer]:
             return make_response(jsonify({'Message': 'BAD_REQUEST'}), 400)
         
-        voting = Voting.query.filter_by(votingId = votingId).first()
+        voting = Voting.query.filter_by(id = votingId).first()
 
         if voting is None:
             return make_response(jsonify({'Message': f'Voting {votingId} not found.'}), 404)
@@ -378,12 +379,12 @@ class VoteManager(Resource):
             userAnswer = None
         
         if None not in [username, votingId, userAnswer]:
-            voting =  Voting.query.filter_by(votingId = votingId).first()
+            voting =  Voting.query.filter_by(id = votingId).first()
             if voting != None and userAnswer != None and username != None:
                 vote = Vote(username, votingId, userAnswer)
                 db.session.add(vote)
                 db.session.commit()
-                return make_response(jsonify({'Vote registered.'}), 201)
+                return make_response(jsonify({'Message': 'Vote registered.'}), 201)
             else:
                 return make_response(jsonify({'Message': 'Vote was not registered.'}), 400)
         else:
