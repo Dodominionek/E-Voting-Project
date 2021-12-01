@@ -330,11 +330,13 @@ class VotingManager(Resource):
 
             votings = Voting.query.all()
             return make_response(jsonify(votings_schema.dump(votings)), 200)
-        elif Voting.query.filter_by(votingId = votingId).first() != None:
-            voting = Voting.query.filter_by(votingId = votingId).first()
+
+        #votingId provided
+        voting = Voting.query.filter_by(id = votingId).first()
+        if voting != None:
             return make_response(jsonify(voting_schema.dump(voting)), 200)
         else:
-            return make_response(jsonify({'Message': 'NOT FOUND'}), 404)
+            return make_response(jsonify({'Message': 'Voting does not exist'}), 404)
                   
     @staticmethod
     def post():
