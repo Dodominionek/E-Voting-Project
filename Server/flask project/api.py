@@ -9,7 +9,7 @@ import pytz, time, threading, os
 app = Flask(__name__) 
 api = Api(app) 
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dodomin.db' 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///evoting.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True 
 app.config["JWT_SECRET_KEY"] = os.urandom(24).hex()
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30)
@@ -86,24 +86,42 @@ votings_schema = VotingSchema(many=True)
 class Vote(db.Model): 
     vote  = db.Table('vote',
     db.Column('id', db.Integer, primary_key=True),
-    db.Column('username', db.String(64)),
-    db.Column('votingId', db.String(64)),
-    db.Column('userAnswer', db.String(64)),
+    db.Column('votingId', db.Integer),
+    db.Column('userAnswer', db.CHAR),
     sqlite_autoincrement=True)
 
-    def __init__(self, username, votingId, userAnswer):
-        self.username = username
+    def __init__(self, votingId, userAnswer):
         self.votingId = votingId
         self.userAnswer = userAnswer
 
 class VoteSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'username', 'votingId', 'userAnswer')
+        fields = ('id', 'votingId', 'userAnswer')
         session = db.Session
 
 vote_schema = VoteSchema() 
 votes_schema = VoteSchema(many=True)
-    
+
+####### UserVote ##############
+class UserVote(db.Model): 
+    user_vote  = db.Table('user_vote',
+    db.Column('id', db.Integer, primary_key=True),
+    db.Column('votingId', db.Integer),
+    db.Column('userId', db.Integer),
+    sqlite_autoincrement=True)
+
+    def __init__(self, votingId, userId):
+        self.votingId = votingId
+        self.userId = userId
+
+class UserVoteSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'votingId', 'userId')
+        session = db.Session
+
+user_vote_schema = UserSchema() 
+users_votes_schema = UserSchema(many=True)
+
 ################### RESOURCES #######################
 
 ####### Register Manager ##############
@@ -283,10 +301,33 @@ class LogoutManager(Resource):
 class VotingManager(Resource):
     @staticmethod
     def get():
-        try: votingId = request.json['votingId']
+        try: votingId = request.args['votingId']
         except Exception as _: votingId = None
+        try: showUnvoted = request.args['showUnvoted']
+        except Exception as _: showUnvoted = False
+        try: username = request.args['username']
+        except Exception as _: username = None
 
         if not votingId:
+            if showUnvoted:
+                #TODO change this to getting user from JWT
+                if not username:
+                    return make_response(jsonify({'Message': 'Missing "username" parameter'}), 400)
+
+                user = User.query.filter_by(username = username).first()
+
+                voted = Voting.query.with_entities(Voting.id, Voting.question) \
+                                    .join(UserVote, Voting.id == UserVote.votingId) \
+                                    .filter_by(userId = user.id).all()
+                all_votings = Voting.query.with_entities(Voting.id, Voting.question).all()
+                for voting1 in voted:
+                    for voting2 in all_votings[:]:
+                        if voting1 == voting2:
+                            all_votings.remove(voting2)
+                            break
+
+                return make_response(jsonify(votings_schema.dump(all_votings)), 200)
+
             votings = Voting.query.all()
             return make_response(jsonify(votings_schema.dump(votings)), 200)
         elif Voting.query.filter_by(votingId = votingId).first() != None:
@@ -351,24 +392,7 @@ class VotingManager(Resource):
 ####### VoteManager ##############
 class VoteManager(Resource):
     @staticmethod
-    def post():
-        try:
-            username = request.json['username']
-            votingId = request.json['votingId']
-            userAnswer = request.json['userAnswer']
-        except Exception as _:
-            username = None
-            votingId = None
-            userAnswer = None
-        
-        if None in [username, votingId, userAnswer]:
-            return make_response(jsonify({'Message': 'BAD_REQUEST'}), 400)
-        
-        voting = Voting.query.filter_by(id = votingId).first()
-
-        if voting is None:
-            return make_response(jsonify({'Message': f'Voting {votingId} not found.'}), 404)
-
+    def post():        
         try:
             username = request.json['username']
             votingId = request.json['votingId']
@@ -380,9 +404,20 @@ class VoteManager(Resource):
         
         if None not in [username, votingId, userAnswer]:
             voting =  Voting.query.filter_by(id = votingId).first()
+            if voting is None:
+                return make_response(jsonify({'Message': f'Voting {votingId} not found.'}), 404)
+
             if voting != None and userAnswer != None and username != None:
-                vote = Vote(username, votingId, userAnswer)
+                #check if user already voted
+                user = User.query.filter_by(username = username).first()
+                user_vote = UserVote.query.filter_by(votingId = votingId, userId = user.id).first()
+                if user_vote != None:
+                    return make_response(jsonify({'Message': 'User already voted in this voting.'}), 403)
+
+                vote = Vote(votingId, userAnswer)
+                user_vote = UserVote(votingId ,user.id)
                 db.session.add(vote)
+                db.session.add(user_vote)
                 db.session.commit()
                 return make_response(jsonify({'Message': 'Vote registered.'}), 201)
             else:
