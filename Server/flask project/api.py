@@ -53,6 +53,56 @@ class TokenBlacklistSchema(ma.Schema):
 
 token_blacklist_schema = TokenBlacklistSchema() 
 tokens_blacklist_schema =  TokenBlacklistSchema(many=True)
+
+####### Voting ##############
+class Voting(db.Model): 
+    voting  = db.Table('voting',
+    db.Column('id', db.Integer, primary_key=True),
+    db.Column('question', db.String(256)),
+    db.Column('answerA', db.String(256)),
+    db.Column('answerB', db.String(256)),
+    db.Column('answerC', db.String(256)),
+    db.Column('answerD', db.String(256)),
+    db.Column('status', db.String(64)),
+    sqlite_autoincrement=True)
+
+    def __init__(self, question, answerA, answerB, answerC, answerD, status):
+        self.question = question
+        self.answerA = answerA
+        self.answerB = answerB
+        self.answerC = answerC
+        self.answerD = answerD
+        self.status = status
+
+class VotingSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'question', 'answerA', 'answerB', 'answerC', 'answerD', 'status')
+        session = db.Session
+
+voting_schema = VotingSchema() 
+votings_schema = VotingSchema(many=True)
+
+####### Vote ##############
+class Vote(db.Model): 
+    vote  = db.Table('vote',
+    db.Column('id', db.Integer, primary_key=True),
+    db.Column('username', db.String(64)),
+    db.Column('votingId', db.String(64)),
+    db.Column('userAnswer', db.String(64)),
+    sqlite_autoincrement=True)
+
+    def __init__(self, username, votingId, userAnswer):
+        self.username = username
+        self.votingId = votingId
+        self.userAnswer = userAnswer
+
+class VoteSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'username', 'votingId', 'userAnswer')
+        session = db.Session
+
+vote_schema = VoteSchema() 
+votes_schema = VoteSchema(many=True)
     
 ################### RESOURCES #######################
 
@@ -229,6 +279,119 @@ class LogoutManager(Resource):
         db.session.commit()
         return make_response(jsonify({ 'Message': 'Succesfully logout' }), 201)
 
+####### Voting Manager ##############
+class VotingManager(Resource):
+    @staticmethod
+    def get():
+        try: votingId = request.json['votingId']
+        except Exception as _: votingId = None
+
+        if not votingId:
+            votings = Voting.query.all()
+            return make_response(jsonify(votings_schema.dump(votings)), 200)
+        elif Voting.query.filter_by(votingId = votingId).first() != None:
+            voting = Voting.query.filter_by(votingId = votingId).first()
+            return make_response(jsonify(voting_schema.dump(voting)), 200)
+        else:
+            return make_response(jsonify({'Message': 'NOT FOUND'}), 404)
+                  
+    @staticmethod
+    def post():
+        try:
+            username = request.json['username']
+            question = request.json['question']
+            answerA = request.json['answerA']
+            answerB = request.json['answerB']
+            answerC = request.json['answerC']
+            answerD = request.json['answerD']
+        except Exception as _: 
+            username = None
+            question = None
+            answerA = None
+            answerB = None
+            answerC = None
+            answerD = None
+
+        if not username or not question or not answerA or not answerB:
+            return make_response(jsonify({ 'Message': 'Must provide the proper data' }), 400)
+
+        user = User.query.filter_by(username = username).first()
+
+        if user == None:
+            return make_response(jsonify({ 'Message': 'User not exist!' }), 404)
+
+        voting = Voting(question, answerA, answerB, answerC, answerD, 'Created')
+
+        db.session.add(voting)
+        db.session.commit()
+        return make_response(jsonify({'Message': f'New Voting {question} created.', 'id': voting.id}), 201)
+
+    @staticmethod
+    def delete():
+        try: 
+            username = request.json['username']
+            votingId = request.json['votingId']
+        except Exception as _: 
+            username = None
+            votingId = None
+
+        if not username or not votingId:
+            return make_response(jsonify({ 'Message': 'No such voting.' }), 400)
+
+        voting = Voting.query.filter_by(id = votingId).first()
+
+        if voting == None:
+            return make_response(jsonify({ 'Message': 'No such voting.' }), 404)
+        
+        db.session.delete(voting)
+        db.session.commit()
+
+        return make_response(jsonify({'Message': f'Voting {votingId} deleted.'}), 200)
+
+####### VoteManager ##############
+class VoteManager(Resource):
+    @staticmethod
+    def post():
+        try:
+            username = request.json['username']
+            votingId = request.json['votingId']
+            userAnswer = request.json['userAnswer']
+        except Exception as _:
+            username = None
+            votingId = None
+            userAnswer = None
+        
+        if None in [username, votingId, userAnswer]:
+            return make_response(jsonify({'Message': 'BAD_REQUEST'}), 400)
+        
+        voting = Voting.query.filter_by(id = votingId).first()
+
+        if voting is None:
+            return make_response(jsonify({'Message': f'Voting {votingId} not found.'}), 404)
+
+        try:
+            username = request.json['username']
+            votingId = request.json['votingId']
+            userAnswer = request.json['userAnswer']
+        except Exception as _:
+            username = None
+            votingId = None
+            userAnswer = None
+        
+        if None not in [username, votingId, userAnswer]:
+            voting =  Voting.query.filter_by(id = votingId).first()
+            if voting != None and userAnswer != None and username != None:
+                vote = Vote(username, votingId, userAnswer)
+                db.session.add(vote)
+                db.session.commit()
+                return make_response(jsonify({'Message': 'Vote registered.'}), 201)
+            else:
+                return make_response(jsonify({'Message': 'Vote was not registered.'}), 400)
+        else:
+            return make_response(jsonify({'Message': 'BAD_REQUEST'}), 400)
+
+
+
 ####### Functions ##############
 
 @jwt.token_in_blocklist_loader
@@ -260,6 +423,8 @@ api.add_resource(RegisterManager, '/signup')
 api.add_resource(UserManager, '/user')
 api.add_resource(LoginManager, '/login')
 api.add_resource(LogoutManager, '/logout')
+api.add_resource(VotingManager, '/voting')
+api.add_resource(VoteManager, '/vote')
 
 if __name__ == '__main__':
     try:
