@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_restful import Resource, Api
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt, get_jwt_identity
 from datetime import timedelta, datetime
 import pytz, time, threading, os
 
@@ -58,6 +58,7 @@ tokens_blacklist_schema =  TokenBlacklistSchema(many=True)
 class Voting(db.Model): 
     voting  = db.Table('voting',
     db.Column('id', db.Integer, primary_key=True),
+    db.Column('ownerId', db.Integer),
     db.Column('question', db.String(256)),
     db.Column('answerA', db.String(256)),
     db.Column('answerB', db.String(256)),
@@ -66,8 +67,9 @@ class Voting(db.Model):
     db.Column('status', db.String(64)),
     sqlite_autoincrement=True)
 
-    def __init__(self, question, answerA, answerB, answerC, answerD, status):
+    def __init__(self, question, ownerId, answerA, answerB, answerC, answerD, status):
         self.question = question
+        self.ownerId = ownerId
         self.answerA = answerA
         self.answerB = answerB
         self.answerC = answerC
@@ -76,7 +78,7 @@ class Voting(db.Model):
 
 class VotingSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'question', 'answerA', 'answerB', 'answerC', 'answerD', 'status')
+        fields = ('id', 'ovnerId' ,'question', 'answerA', 'answerB', 'answerC', 'answerD', 'status')
         session = db.Session
 
 voting_schema = VotingSchema() 
@@ -300,21 +302,16 @@ class LogoutManager(Resource):
 ####### Voting Manager ##############
 class VotingManager(Resource):
     @staticmethod
+    @jwt_required()
     def get():
         try: votingId = request.args['votingId']
         except Exception as _: votingId = None
         try: showUnvoted = request.args['showUnvoted']
         except Exception as _: showUnvoted = False
-        try: username = request.args['username']
-        except Exception as _: username = None
-
+        
         if not votingId:
             if showUnvoted:
-                #TODO change this to getting user from JWT
-                if not username:
-                    return make_response(jsonify({'Message': 'Missing "username" parameter'}), 400)
-
-                user = User.query.filter_by(username = username).first()
+                user = User.query.filter_by(id = get_jwt_identity()).first()
 
                 voted = Voting.query.with_entities(Voting.id, Voting.question) \
                                     .join(UserVote, Voting.id == UserVote.votingId) \
@@ -328,7 +325,8 @@ class VotingManager(Resource):
 
                 return make_response(jsonify(votings_schema.dump(all_votings)), 200)
 
-            votings = Voting.query.all()
+            #show all voting ids and question
+            votings = Voting.query.with_entities(Voting.id, Voting.question).all()
             return make_response(jsonify(votings_schema.dump(votings)), 200)
 
         #votingId provided
@@ -339,49 +337,47 @@ class VotingManager(Resource):
             return make_response(jsonify({'Message': 'Voting does not exist'}), 404)
                   
     @staticmethod
+    @jwt_required()
     def post():
         try:
-            username = request.json['username']
             question = request.json['question']
             answerA = request.json['answerA']
             answerB = request.json['answerB']
             answerC = request.json['answerC']
             answerD = request.json['answerD']
         except Exception as _: 
-            username = None
             question = None
             answerA = None
             answerB = None
             answerC = None
             answerD = None
 
-        if not username or not question or not answerA or not answerB:
+        if not question or not answerA or not answerB:
             return make_response(jsonify({ 'Message': 'Must provide the proper data' }), 400)
-
-        user = User.query.filter_by(username = username).first()
+        
+        user = User.query.filter_by(id = get_jwt_identity()).first()
 
         if user == None:
             return make_response(jsonify({ 'Message': 'User not exist!' }), 404)
 
-        voting = Voting(question, answerA, answerB, answerC, answerD, 'Created')
+        voting = Voting(question, user.id, answerA, answerB, answerC, answerD, 'Created')
 
         db.session.add(voting)
         db.session.commit()
         return make_response(jsonify({'Message': f'New Voting {question} created.', 'id': voting.id}), 201)
 
     @staticmethod
+    @jwt_required()
     def delete():
         try: 
-            username = request.json['username']
             votingId = request.json['votingId']
-        except Exception as _: 
-            username = None
+        except Exception as _:
             votingId = None
 
-        if not username or not votingId:
-            return make_response(jsonify({ 'Message': 'No such voting.' }), 400)
+        if not votingId:
+            return make_response(jsonify({ 'Message': 'Missing parameter' }), 400)
 
-        voting = Voting.query.filter_by(id = votingId).first()
+        voting = Voting.query.filter_by(id = votingId, ownerId = get_jwt_identity()).first()
 
         if voting == None:
             return make_response(jsonify({ 'Message': 'No such voting.' }), 404)
@@ -394,28 +390,28 @@ class VotingManager(Resource):
 ####### VoteManager ##############
 class VoteManager(Resource):
     @staticmethod
+    @jwt_required()
     def post():        
         try:
-            username = request.json['username']
             votingId = request.json['votingId']
             userAnswer = request.json['userAnswer']
         except Exception as _:
-            username = None
             votingId = None
             userAnswer = None
         
-        if None not in [username, votingId, userAnswer]:
+        if None not in [votingId, userAnswer]:
             voting =  Voting.query.filter_by(id = votingId).first()
             if voting is None:
                 return make_response(jsonify({'Message': f'Voting {votingId} not found.'}), 404)
 
-            if voting != None and userAnswer != None and username != None:
+            if voting != None and userAnswer != None:
                 #check if user already voted
-                user = User.query.filter_by(username = username).first()
+                user = User.query.filter_by(id = get_jwt_identity()).first()
                 user_vote = UserVote.query.filter_by(votingId = votingId, userId = user.id).first()
                 if user_vote != None:
                     return make_response(jsonify({'Message': 'User already voted in this voting.'}), 403)
 
+                #TODO przy zakończeniu głosowania i podliczeniu głosów usunąć vote i userVote powiązane z tym głosowaniem
                 vote = Vote(votingId, userAnswer)
                 user_vote = UserVote(votingId ,user.id)
                 db.session.add(vote)
