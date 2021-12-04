@@ -84,6 +84,30 @@ class VotingSchema(ma.Schema):
 voting_schema = VotingSchema() 
 votings_schema = VotingSchema(many=True)
 
+####### Result ##############
+class Result(db.Model): 
+    voting  = db.Table('result',
+    db.Column('votingId', db.Integer, primary_key=True),
+    db.Column('answerA', db.Integer),
+    db.Column('answerB', db.Integer),
+    db.Column('answerC', db.Integer),
+    db.Column('answerD', db.Integer))
+
+    def __init__(self, votingId, answerA, answerB, answerC, answerD):
+        self.votingId = votingId
+        self.answerA = answerA
+        self.answerB = answerB
+        self.answerC = answerC
+        self.answerD = answerD
+
+class ResultSchema(ma.Schema):
+    class Meta:
+        fields = ('votingId', 'answerA', 'answerB', 'answerC', 'answerD')
+        session = db.Session
+
+result_schema = ResultSchema() 
+results_schema = ResultSchema(many=True)
+
 ####### Vote ##############
 class Vote(db.Model): 
     vote  = db.Table('vote',
@@ -316,7 +340,7 @@ class VotingManager(Resource):
                 voted = Voting.query.with_entities(Voting.id, Voting.question) \
                                     .join(UserVote, Voting.id == UserVote.votingId) \
                                     .filter_by(userId = user.id).all()
-                all_votings = Voting.query.with_entities(Voting.id, Voting.question).all()
+                all_votings = Voting.query.with_entities(Voting.id, Voting.question).filter_by(status = 'Created').all()
                 for voting1 in voted:
                     for voting2 in all_votings[:]:
                         if voting1 == voting2:
@@ -335,7 +359,43 @@ class VotingManager(Resource):
             return make_response(jsonify(voting_schema.dump(voting)), 200)
         else:
             return make_response(jsonify({'Message': 'Voting does not exist'}), 404)
-                  
+
+    @staticmethod
+    @jwt_required()
+    def patch():
+        try:
+            endVoting = request.json['endVoting']
+        except Exception as _:
+            endVoting = False
+        try:
+            votingId = request.json['id']
+        except Exception as _:
+            votingId = None
+
+        if not votingId:
+            return make_response(jsonify({ 'Message': 'Missing parameter' }), 400)
+
+        voting = Voting.query.filter_by(id = votingId, ownerId = get_jwt_identity()).first()
+
+        if voting == None:
+            return make_response(jsonify({ 'Message': 'No such voting.' }), 404)
+
+        #ends voting on user demand
+        if endVoting:
+            voting.status = 'Ended'
+            answerA = Vote.query.filter_by(votingId = votingId, userAnswer = 'A').count()
+            answerB = Vote.query.filter_by(votingId = votingId, userAnswer = 'B').count()
+            answerC = Vote.query.filter_by(votingId = votingId, userAnswer = 'C').count()
+            answerD = Vote.query.filter_by(votingId = votingId, userAnswer = 'D').count()
+
+            result = Result(votingId, answerA, answerB, answerC, answerD)
+            db.session.add(result)
+            db.session.commit()
+
+            return make_response(jsonify({ 'Message': 'Voting ended.' }), 200)
+        
+        return make_response(jsonify({ 'Message': 'No action performed.' }), 400)
+
     @staticmethod
     @jwt_required()
     def post():
@@ -387,6 +447,36 @@ class VotingManager(Resource):
 
         return make_response(jsonify({'Message': f'Voting {votingId} deleted.'}), 200)
 
+####### Result Manager ##############
+class ResultManager(Resource):
+    @staticmethod
+    @jwt_required()
+    def get():
+        try: votingId = request.args['votingId']
+        except Exception as _: votingId = None
+        try: showVoted = request.args['showVoted']
+        except Exception as _: showVoted = False
+        
+        if not votingId:
+            if showVoted:
+                user = User.query.filter_by(id = get_jwt_identity()).first()
+
+                voted = Result.query.join(UserVote, Result.votingId == UserVote.votingId) \
+                                    .filter_by(userId = user.id).all()
+
+                return make_response(jsonify(results_schema.dump(voted)), 200)
+
+            #show all
+            results = Result.query.all()
+            return make_response(jsonify(results_schema.dump(results)), 200)
+
+        #votingId provided
+        result = Result.query.filter_by(votingId = votingId).first()
+        if result != None:
+            return make_response(jsonify(result_schema.dump(result)), 200)
+        else:
+            return make_response(jsonify({'Message': 'Result for voting does not exist'}), 404)
+
 ####### VoteManager ##############
 class VoteManager(Resource):
     @staticmethod
@@ -403,6 +493,9 @@ class VoteManager(Resource):
             voting =  Voting.query.filter_by(id = votingId).first()
             if voting is None:
                 return make_response(jsonify({'Message': f'Voting {votingId} not found.'}), 404)
+
+            if voting.status == 'Ended':
+                return make_response(jsonify({'Message': f'Voting {votingId} has ended. No more votes can be casted'}), 403)
 
             if voting != None and userAnswer != None:
                 #check if user already voted
@@ -458,6 +551,7 @@ api.add_resource(LoginManager, '/login')
 api.add_resource(LogoutManager, '/logout')
 api.add_resource(VotingManager, '/voting')
 api.add_resource(VoteManager, '/vote')
+api.add_resource(ResultManager, '/result')
 
 if __name__ == '__main__':
     try:
