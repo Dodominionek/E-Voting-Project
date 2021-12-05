@@ -2,14 +2,14 @@ from flask import Flask, request, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_restful import Resource, Api
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt, get_jwt_identity
 from datetime import timedelta, datetime
 import pytz, time, threading, os
 
 app = Flask(__name__) 
 api = Api(app) 
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///evoting.db' 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///evoting.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True 
 app.config["JWT_SECRET_KEY"] = os.urandom(24).hex()
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30)
@@ -58,6 +58,7 @@ tokens_blacklist_schema =  TokenBlacklistSchema(many=True)
 class Voting(db.Model): 
     voting  = db.Table('voting',
     db.Column('id', db.Integer, primary_key=True),
+    db.Column('ownerId', db.Integer),
     db.Column('question', db.String(256)),
     db.Column('answerA', db.String(256)),
     db.Column('answerB', db.String(256)),
@@ -66,8 +67,9 @@ class Voting(db.Model):
     db.Column('status', db.String(64)),
     sqlite_autoincrement=True)
 
-    def __init__(self, question, answerA, answerB, answerC, answerD, status):
+    def __init__(self, question, ownerId, answerA, answerB, answerC, answerD, status):
         self.question = question
+        self.ownerId = ownerId
         self.answerA = answerA
         self.answerB = answerB
         self.answerC = answerC
@@ -76,34 +78,76 @@ class Voting(db.Model):
 
 class VotingSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'question', 'answerA', 'answerB', 'answerC', 'answerD', 'status')
+        fields = ('id', 'ovnerId' ,'question', 'answerA', 'answerB', 'answerC', 'answerD', 'status')
         session = db.Session
 
 voting_schema = VotingSchema() 
 votings_schema = VotingSchema(many=True)
 
+####### Result ##############
+class Result(db.Model): 
+    voting  = db.Table('result',
+    db.Column('votingId', db.Integer, primary_key=True),
+    db.Column('answerA', db.Integer),
+    db.Column('answerB', db.Integer),
+    db.Column('answerC', db.Integer),
+    db.Column('answerD', db.Integer))
+
+    def __init__(self, votingId, answerA, answerB, answerC, answerD):
+        self.votingId = votingId
+        self.answerA = answerA
+        self.answerB = answerB
+        self.answerC = answerC
+        self.answerD = answerD
+
+class ResultSchema(ma.Schema):
+    class Meta:
+        fields = ('votingId', 'answerA', 'answerB', 'answerC', 'answerD')
+        session = db.Session
+
+result_schema = ResultSchema() 
+results_schema = ResultSchema(many=True)
+
 ####### Vote ##############
 class Vote(db.Model): 
     vote  = db.Table('vote',
     db.Column('id', db.Integer, primary_key=True),
-    db.Column('username', db.String(64)),
-    db.Column('votingId', db.String(64)),
-    db.Column('userAnswer', db.String(64)),
+    db.Column('votingId', db.Integer),
+    db.Column('userAnswer', db.CHAR),
     sqlite_autoincrement=True)
 
-    def __init__(self, username, votingId, userAnswer):
-        self.username = username
+    def __init__(self, votingId, userAnswer):
         self.votingId = votingId
         self.userAnswer = userAnswer
 
 class VoteSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'username', 'votingId', 'userAnswer')
+        fields = ('id', 'votingId', 'userAnswer')
         session = db.Session
 
 vote_schema = VoteSchema() 
 votes_schema = VoteSchema(many=True)
-    
+
+####### UserVote ##############
+class UserVote(db.Model): 
+    user_vote  = db.Table('user_vote',
+    db.Column('id', db.Integer, primary_key=True),
+    db.Column('votingId', db.Integer),
+    db.Column('userId', db.Integer),
+    sqlite_autoincrement=True)
+
+    def __init__(self, votingId, userId):
+        self.votingId = votingId
+        self.userId = userId
+
+class UserVoteSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'votingId', 'userId')
+        session = db.Session
+
+user_vote_schema = UserSchema() 
+users_votes_schema = UserSchema(many=True)
+
 ################### RESOURCES #######################
 
 ####### Register Manager ##############
@@ -282,107 +326,205 @@ class LogoutManager(Resource):
 ####### Voting Manager ##############
 class VotingManager(Resource):
     @staticmethod
+    @jwt_required()
     def get():
-        try: votingId = request.json['votingId']
+        try: votingId = request.args['votingId']
         except Exception as _: votingId = None
-
+        try: showUnvoted = request.args['showUnvoted']
+        except Exception as _: showUnvoted = False
+        
         if not votingId:
-            votings = Voting.query.all()
+            if showUnvoted:
+                user = User.query.filter_by(id = get_jwt_identity()).first()
+
+                voted = Voting.query.with_entities(Voting.id, Voting.question) \
+                                    .join(UserVote, Voting.id == UserVote.votingId) \
+                                    .filter_by(userId = user.id).all()
+                all_votings = Voting.query.with_entities(Voting.id, Voting.question).filter_by(status = 'Created').all()
+                for voting1 in voted:
+                    for voting2 in all_votings[:]:
+                        if voting1 == voting2:
+                            all_votings.remove(voting2)
+                            break
+
+                return make_response(jsonify(votings_schema.dump(all_votings)), 200)
+
+            #show all voting ids and question
+            votings = Voting.query.with_entities(Voting.id, Voting.question).all()
             return make_response(jsonify(votings_schema.dump(votings)), 200)
-        elif Voting.query.filter_by(votingId = votingId).first() != None:
-            voting = Voting.query.filter_by(votingId = votingId).first()
+
+        #votingId provided
+        voting = Voting.query.filter_by(id = votingId).first()
+        if voting != None:
             return make_response(jsonify(voting_schema.dump(voting)), 200)
         else:
-            return make_response(jsonify({'Message': 'NOT FOUND'}), 404)
-                  
+            return make_response(jsonify({'Message': 'Voting does not exist'}), 404)
+
     @staticmethod
+    @jwt_required()
+    def patch():
+        try:
+            endVoting = request.json['endVoting']
+        except Exception as _:
+            endVoting = False
+        try:
+            votingId = request.json['id']
+        except Exception as _:
+            votingId = None
+
+        if not votingId:
+            return make_response(jsonify({ 'Message': 'Missing parameter' }), 400)
+
+        voting = Voting.query.filter_by(id = votingId, ownerId = get_jwt_identity()).first()
+
+        if voting == None:
+            return make_response(jsonify({ 'Message': 'No such voting.' }), 404)
+
+        #ends voting on user demand
+        if endVoting:
+            voting.status = 'Ended'
+            answerA = Vote.query.filter_by(votingId = votingId, userAnswer = 'A').count()
+            answerB = Vote.query.filter_by(votingId = votingId, userAnswer = 'B').count()
+            answerC = Vote.query.filter_by(votingId = votingId, userAnswer = 'C').count()
+            answerD = Vote.query.filter_by(votingId = votingId, userAnswer = 'D').count()
+
+            result = Result(votingId, answerA, answerB, answerC, answerD)
+
+            #find all votes from this voting and remove them
+            Vote.query.filter_by(votingId = votingId).delete()
+
+            #find all entires for user votes for this voting and remove them
+            UserVote.query.filter_by(votingId = votingId).delete()
+
+            db.session.add(result)
+            db.session.commit()
+
+            return make_response(jsonify({ 'Message': 'Voting ended.' }), 200)
+        
+        return make_response(jsonify({ 'Message': 'No action performed.' }), 400)
+
+    @staticmethod
+    @jwt_required()
     def post():
         try:
-            username = request.json['username']
             question = request.json['question']
             answerA = request.json['answerA']
             answerB = request.json['answerB']
             answerC = request.json['answerC']
             answerD = request.json['answerD']
         except Exception as _: 
-            username = None
             question = None
             answerA = None
             answerB = None
             answerC = None
             answerD = None
 
-        if not username or not question or not answerA or not answerB:
+        if not question or not answerA or not answerB:
             return make_response(jsonify({ 'Message': 'Must provide the proper data' }), 400)
-
-        user = User.query.filter_by(username = username).first()
+        
+        user = User.query.filter_by(id = get_jwt_identity()).first()
 
         if user == None:
             return make_response(jsonify({ 'Message': 'User not exist!' }), 404)
 
-        voting = Voting(question, answerA, answerB, answerC, answerD, 'Created')
+        voting = Voting(question, user.id, answerA, answerB, answerC, answerD, 'Created')
 
         db.session.add(voting)
         db.session.commit()
         return make_response(jsonify({'Message': f'New Voting {question} created.', 'id': voting.id}), 201)
 
     @staticmethod
+    @jwt_required()
     def delete():
         try: 
-            username = request.json['username']
             votingId = request.json['votingId']
-        except Exception as _: 
-            username = None
+        except Exception as _:
             votingId = None
 
-        if not username or not votingId:
-            return make_response(jsonify({ 'Message': 'No such voting.' }), 400)
+        if not votingId:
+            return make_response(jsonify({ 'Message': 'Missing parameter' }), 400)
 
-        voting = Voting.query.filter_by(id = votingId).first()
+        voting = Voting.query.filter_by(id = votingId, ownerId = get_jwt_identity()).first()
 
         if voting == None:
             return make_response(jsonify({ 'Message': 'No such voting.' }), 404)
+
+        #find all votes from this voting and remove them
+        Vote.query.filter_by(votingId = votingId).delete()
+
+        #find all entires for user votes for this voting and remove them
+        UserVote.query.filter_by(votingId = votingId).delete()
+
+        #find and remove result if voting ended
+        Result.query.filter_by(votingId = votingId).delete()
         
         db.session.delete(voting)
         db.session.commit()
 
         return make_response(jsonify({'Message': f'Voting {votingId} deleted.'}), 200)
 
+####### Result Manager ##############
+class ResultManager(Resource):
+    @staticmethod
+    @jwt_required()
+    def get():
+        try: votingId = request.args['votingId']
+        except Exception as _: votingId = None
+        try: showVoted = request.args['showVoted']
+        except Exception as _: showVoted = False
+        
+        if not votingId:
+            if showVoted:
+                user = User.query.filter_by(id = get_jwt_identity()).first()
+
+                voted = Result.query.join(UserVote, Result.votingId == UserVote.votingId) \
+                                    .filter_by(userId = user.id).all()
+
+                return make_response(jsonify(results_schema.dump(voted)), 200)
+
+            #show all
+            results = Result.query.all()
+            return make_response(jsonify(results_schema.dump(results)), 200)
+
+        #votingId provided
+        result = Result.query.filter_by(votingId = votingId).first()
+        if result != None:
+            return make_response(jsonify(result_schema.dump(result)), 200)
+        else:
+            return make_response(jsonify({'Message': 'Result for voting does not exist'}), 404)
+
 ####### VoteManager ##############
 class VoteManager(Resource):
     @staticmethod
-    def post():
+    @jwt_required()
+    def post():        
         try:
-            username = request.json['username']
             votingId = request.json['votingId']
             userAnswer = request.json['userAnswer']
         except Exception as _:
-            username = None
             votingId = None
             userAnswer = None
         
-        if None in [username, votingId, userAnswer]:
-            return make_response(jsonify({'Message': 'BAD_REQUEST'}), 400)
-        
-        voting = Voting.query.filter_by(id = votingId).first()
-
-        if voting is None:
-            return make_response(jsonify({'Message': f'Voting {votingId} not found.'}), 404)
-
-        try:
-            username = request.json['username']
-            votingId = request.json['votingId']
-            userAnswer = request.json['userAnswer']
-        except Exception as _:
-            username = None
-            votingId = None
-            userAnswer = None
-        
-        if None not in [username, votingId, userAnswer]:
+        if None not in [votingId, userAnswer]:
             voting =  Voting.query.filter_by(id = votingId).first()
-            if voting != None and userAnswer != None and username != None:
-                vote = Vote(username, votingId, userAnswer)
+            if voting is None:
+                return make_response(jsonify({'Message': f'Voting {votingId} not found.'}), 404)
+
+            if voting.status == 'Ended':
+                return make_response(jsonify({'Message': f'Voting {votingId} has ended. No more votes can be casted'}), 403)
+
+            if voting != None and userAnswer != None:
+                #check if user already voted
+                user = User.query.filter_by(id = get_jwt_identity()).first()
+                user_vote = UserVote.query.filter_by(votingId = votingId, userId = user.id).first()
+                if user_vote != None:
+                    return make_response(jsonify({'Message': 'User already voted in this voting.'}), 403)
+
+                #TODO przy zakończeniu głosowania i podliczeniu głosów usunąć vote i userVote powiązane z tym głosowaniem
+                vote = Vote(votingId, userAnswer)
+                user_vote = UserVote(votingId ,user.id)
                 db.session.add(vote)
+                db.session.add(user_vote)
                 db.session.commit()
                 return make_response(jsonify({'Message': 'Vote registered.'}), 201)
             else:
@@ -425,6 +567,7 @@ api.add_resource(LoginManager, '/login')
 api.add_resource(LogoutManager, '/logout')
 api.add_resource(VotingManager, '/voting')
 api.add_resource(VoteManager, '/vote')
+api.add_resource(ResultManager, '/result')
 
 if __name__ == '__main__':
     try:
