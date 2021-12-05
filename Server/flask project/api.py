@@ -9,7 +9,7 @@ import pytz, time, threading, os
 app = Flask(__name__) 
 api = Api(app) 
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dodomin.db' 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///evoting.db' 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True 
 app.config["JWT_SECRET_KEY"] = os.urandom(24).hex()
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30)
