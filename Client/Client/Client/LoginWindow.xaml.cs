@@ -31,7 +31,8 @@ namespace Client
         {
             var request = new RestRequest("login",Method.POST);
             request.RequestFormat = RestSharp.DataFormat.Json;
-            request.AddJsonBody(new User(loginBox.Text, passBox.Password));
+            var user = new User(loginBox.Text, passBox.Password);
+            request.AddJsonBody(user);
             var response = HttpClient.HttpClient.MakeRequest(request);
             if(!response.IsSuccessful)
             {
@@ -39,9 +40,12 @@ namespace Client
             }
             else
             {
+
                 incorrectLabel.Visibility = Visibility.Hidden;
                 var token = JsonConvert.DeserializeObject<Token>(response.Content);
                 Console.WriteLine(token);
+                MainWindow mainWindow = new MainWindow(token, user);
+                mainWindow.Show();
             }
 
         }

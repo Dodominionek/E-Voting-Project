@@ -23,18 +23,19 @@ namespace Client
     /// </summary>
     public partial class MainWindow : Window
     {
-        string token = "";
+        Token token = new Token();
         User user = new User();
-        public MainWindow(string token,User user)
+        public MainWindow(Token token,User user)
         {
             this.user = user;
             this.token = token;
             InitializeComponent();
-            init();
+            Init();
         }
-        void init() {
-            var request = new RestRequest("/user?username="+user.username, Method.GET);
+        void Init() {
+            var request = new RestRequest("/voting?username=" + user.username, Method.GET);
             request.RequestFormat = RestSharp.DataFormat.Json;
+            request.AddHeader("Authorization", "Bearer " + token.token);
             var response = HttpClient.HttpClient.MakeRequest(request);
 
             if (!response.IsSuccessful)
