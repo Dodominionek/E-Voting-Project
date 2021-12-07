@@ -5,26 +5,25 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Client"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid OpacityMask="#FFE82525" Background="#FFEAD5BD">
+        Title="E voting" Height="550" Width="800">
+    <Grid OpacityMask="#FFE82525" Background="#FFEAD5BD" Margin="0,0,0,-16">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0*"/>
             <ColumnDefinition/>
             <ColumnDefinition Width="4*"/>
         </Grid.ColumnDefinitions>
-        <ListBox x:Name="votings" Grid.Column="1" Margin="9,21,10,33" Background="#FFF7E8D5" SelectionChanged="DisplaySelected"/>
+        <ListBox x:Name="votings" Grid.Column="1" Margin="9,21,10,57" Background="#FFF7E8D5" SelectionChanged="DisplaySelected"/>
         <Label x:Name="votingsLabel" Content="Głosowania" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="9,0,0,0" VerticalAlignment="Top" Height="24"/>
-        <Button x:Name="activeVotings" Content="Aktyw.&#xD;&#xA;" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="9,406,0,0" VerticalAlignment="Top" Width="45" Height="22" Background="#FFF7E8D5"/>
-        <Button x:Name="endedVotings" Content="Zak." Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="54,406,0,0" VerticalAlignment="Top" Width="26" Height="22" Background="#FFF7E8D5"/>
-        <Button x:Name="availableVotings" Content="Dost." Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="80,406,0,0" VerticalAlignment="Top" Width="32" Height="22" Background="#FFF7E8D5"/>
-        <Button x:Name="allVotings" Content="Wszys." Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="112,406,0,0" VerticalAlignment="Top" Width="38" Height="22" Background="#FFF7E8D5"/>
-        <TextBlock x:Name="votingDescription" Grid.Column="2" HorizontalAlignment="Left" Margin="0,52,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="271" Width="620" Background="#FFF7E8D5"><Run Text="Czy jesteś za wprowadzeniem rozszerzonego podatku na dżem wiśniowy"/><Run Language="pl-pl" Text=" czy malinowy"/><Run Text="?"/></TextBlock>
-        <Label x:Name="votingName" Content="Głosowanie 1" Grid.Column="2" HorizontalAlignment="Left" Margin="0,21,0,0" VerticalAlignment="Top" Width="620" Background="#FFF7E8D5"/>
-        <Rectangle Grid.Column="2" HorizontalAlignment="Left" Height="100" Margin="0,328,0,0" Stroke="Black" VerticalAlignment="Top" Width="620" Fill="#FFF7E8D5"/>
-        <Button x:Name="answerA" Content="Malinowy" Grid.Column="2" HorizontalAlignment="Left" Margin="10,333,0,0" VerticalAlignment="Top" Width="600"/>
-        <Button x:Name="answerC" Content="Nie mam zdania" Grid.Column="2" HorizontalAlignment="Left" Margin="10,383,0,0" VerticalAlignment="Top" Width="600"/>
-        <Button x:Name="answerB" Content="Wiśniowy" Grid.Column="2" HorizontalAlignment="Left" Margin="10,358,0,0" VerticalAlignment="Top" Width="600"/>
-        <Button x:Name="answerD" Content="Nie chcę wprowadzać podatku na żaden z wyżej wymienionych dżemów" Grid.Column="2" HorizontalAlignment="Left" Margin="10,407,0,0" VerticalAlignment="Top" Width="600"/>
+        <Button x:Name="activeVotings" Content="Aktyw.&#xD;&#xA;" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="9,448,0,0" VerticalAlignment="Top" Width="45" Height="22" Background="#FFF7E8D5"/>
+        <Button x:Name="endedVotings" Content="Zak." Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="54,448,0,0" VerticalAlignment="Top" Width="26" Height="22" Background="#FFF7E8D5"/>
+        <Button x:Name="availableVotings" Content="Dost." Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="80,448,0,0" VerticalAlignment="Top" Width="32" Height="22" Background="#FFF7E8D5"/>
+        <Button x:Name="allVotings" Content="Wszys." Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="112,448,0,0" VerticalAlignment="Top" Width="38" Height="22" Background="#FFF7E8D5"/>
+        <TextBlock x:Name="votingDescription" Grid.Column="2" HorizontalAlignment="Left" Margin="0,21,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="329" Width="620" Background="#FFF7E8D5"><Run Text="Czy jesteś za wprowadzeniem rozszerzonego podatku na dżem wiśniowy"/><Run Language="pl-pl" Text=" czy malinowy"/><Run Text="?"/></TextBlock>
+        <Rectangle Grid.Column="2" HorizontalAlignment="Left" Height="115" Margin="0,355,0,0" Stroke="Black" VerticalAlignment="Top" Width="620" Fill="#FFF7E8D5"/>
+        <Button x:Name="answerA" Content="Malinowy" Grid.Column="2" HorizontalAlignment="Left" Margin="10,364,0,0" VerticalAlignment="Top" Width="600"/>
+        <Button x:Name="answerC" Content="Nie mam zdania" Grid.Column="2" HorizontalAlignment="Left" Margin="10,414,0,0" VerticalAlignment="Top" Width="600"/>
+        <Button x:Name="answerB" Content="Wiśniowy" Grid.Column="2" HorizontalAlignment="Left" Margin="10,389,0,0" VerticalAlignment="Top" Width="600"/>
+        <Button x:Name="answerD" Content="Nie chcę wprowadzać podatku na żaden z wyżej wymienionych dżemów" Grid.Column="2" HorizontalAlignment="Left" Margin="10,439,0,0" VerticalAlignment="Top" Width="600"/>
 
     </Grid>
 </Window>
