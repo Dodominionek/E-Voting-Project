@@ -46,6 +46,7 @@ namespace Client
                 Console.WriteLine(token);
                 MainWindow mainWindow = new MainWindow(token, user);
                 mainWindow.Show();
+                this.Close();
             }
 
         }

@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using HttpClient;
+using Newtonsoft.Json;
+
 using RestSharp;
 
 
@@ -25,6 +27,7 @@ namespace Client
     {
         Token token = new Token();
         User user = new User();
+        List<Voting> votingsList;
         public MainWindow(Token token,User user)
         {
             this.user = user;
@@ -37,16 +40,45 @@ namespace Client
             request.RequestFormat = RestSharp.DataFormat.Json;
             request.AddHeader("Authorization", "Bearer " + token.token);
             var response = HttpClient.HttpClient.MakeRequest(request);
-
+            votingsList = JsonConvert.DeserializeObject<List<Voting>>(response.Content);
             if (!response.IsSuccessful)
             {
-                
+                if (MessageBox.Show("Dane nie zostały poprawnie wczytane. Wczytać ponownie?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                {
+                    Init();
+                }
+                else
+                {
+                    System.Windows.Application.Current.Shutdown();
+                }
             }
             else
             {
-              
+                foreach(Voting elem in votingsList)
+                {
+                    votings.Items.Add(elem.id+". "+elem.question);
+                }
+                
             }
         }
+        
+        private void DisplaySelected(object sender, SelectionChangedEventArgs e)
+        {
+            var item = (ListBox)sender;
+            var votingName = item.SelectedItem.ToString();
+            var votingIndex = votingName[0];
+            foreach (Voting elem in votingsList)
+            {
+                if (elem.id.ToString().Equals(votingIndex))
+                {
+                    votingDescription.Text = elem.question;
+                    answerA.Content = elem.answerA;
+                    answerB.Content = elem.answerB;
+                    answerC.Content = elem.answerC;
+                    answerD.Content = elem.answerD;
 
+                }
+            }
+        }
     }
 }

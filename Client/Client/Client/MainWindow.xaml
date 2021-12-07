@@ -12,7 +12,7 @@
             <ColumnDefinition/>
             <ColumnDefinition Width="4*"/>
         </Grid.ColumnDefinitions>
-        <ListBox x:Name="votings" Grid.Column="1" Margin="9,21,10,33" Background="#FFF7E8D5"/>
+        <ListBox x:Name="votings" Grid.Column="1" Margin="9,21,10,33" Background="#FFF7E8D5" SelectionChanged="DisplaySelected"/>
         <Label x:Name="votingsLabel" Content="Głosowania" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="9,0,0,0" VerticalAlignment="Top" Height="24"/>
         <Button x:Name="activeVotings" Content="Aktyw.&#xD;&#xA;" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="9,406,0,0" VerticalAlignment="Top" Width="45" Height="22" Background="#FFF7E8D5"/>
         <Button x:Name="endedVotings" Content="Zak." Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="54,406,0,0" VerticalAlignment="Top" Width="26" Height="22" Background="#FFF7E8D5"/>

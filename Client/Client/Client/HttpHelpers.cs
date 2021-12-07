@@ -30,4 +30,39 @@ namespace HttpClient
 
 
     }
+    public class Voting
+    {
+        /*"answerA": "GIT",
+        "answerB": "JWT",
+        "answerC": "PUT",
+        "answerD": "PIS",
+        "id": 2,
+        "question": "Co tam wariacie?",
+        "status": "Created"*/
+        public string answerA,answerB,answerC,answerD;
+        public int id;
+        public string question;
+        public string status;
+        public Voting()
+        {
+            answerA = "a";
+            answerB = "b";
+            answerC = "c";
+            answerD = "d";
+            id = 0;
+            question = "question";
+            status = "";
+        }
+        public Voting(string A,string B, string C, string D, int id, string Question, string Status)
+        {
+            answerA = A;
+            answerB = B;
+            answerC = C;
+            answerD = D;
+            this.id = id;
+            question = Question;
+            status = Status;
+        }
+
+    }
 }
