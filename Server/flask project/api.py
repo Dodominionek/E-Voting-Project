@@ -332,25 +332,38 @@ class VotingManager(Resource):
         except Exception as _: votingId = None
         try: showUnvoted = request.args['showUnvoted']
         except Exception as _: showUnvoted = False
+        try: onlyQuestions = request.args['onlyQuestions']
+        except Exception as _: onlyQuestions = False
         
         if not votingId:
             if showUnvoted:
                 user = User.query.filter_by(id = get_jwt_identity()).first()
 
-                voted = Voting.query.with_entities(Voting.id, Voting.question) \
-                                    .join(UserVote, Voting.id == UserVote.votingId) \
-                                    .filter_by(userId = user.id).all()
-                all_votings = Voting.query.with_entities(Voting.id, Voting.question).filter_by(status = 'Created').all()
+                if onlyQuestions:    
+                    voted = Voting.query.with_entities(Voting.id, Voting.question) \
+                                        .join(UserVote, Voting.id == UserVote.votingId) \
+                                        .filter_by(userId = user.id).all()
+                    all_votings = Voting.query.with_entities(Voting.id, Voting.question).filter_by(status = 'Created').all()
+                else:
+                    voted = Voting.query.with_entities(Voting.id, Voting.question) \
+                                        .join(UserVote, Voting.id == UserVote.votingId) \
+                                        .filter_by(userId = user.id).all()
+                    all_votings = Voting.query.with_entities(Voting.id, Voting.question, Voting.answerA, Voting.answerB, Voting.answerC, Voting.answerD, Voting.status) \
+                                        .filter_by(status = 'Created').all()
+
                 for voting1 in voted:
                     for voting2 in all_votings[:]:
-                        if voting1 == voting2:
+                        if voting1.id == voting2.id:
                             all_votings.remove(voting2)
                             break
 
                 return make_response(jsonify(votings_schema.dump(all_votings)), 200)
 
             #show all voting ids and question
-            votings = Voting.query.with_entities(Voting.id, Voting.question).all()
+            if onlyQuestions:
+                votings = Voting.query.with_entities(Voting.id, Voting.question).all()
+            else:
+                votings = Voting.query.with_entities(Voting.id, Voting.question, Voting.answerA, Voting.answerB, Voting.answerC, Voting.answerD, Voting.status).all()
             return make_response(jsonify(votings_schema.dump(votings)), 200)
 
         #votingId provided
