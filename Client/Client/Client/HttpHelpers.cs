@@ -21,9 +21,9 @@ namespace HttpClient
     }
     public class Token
     {
-        public string token= "";
+        public string token = "";
         public Token() { }
-        public Token(string token) 
+        public Token(string token)
         {
             this.token = token;
         }
@@ -39,7 +39,7 @@ namespace HttpClient
         "id": 2,
         "question": "Co tam wariacie?",
         "status": "Created"*/
-        public string answerA,answerB,answerC,answerD;
+        public string answerA, answerB, answerC, answerD;
         public int id;
         public string question;
         public string status;
@@ -53,7 +53,7 @@ namespace HttpClient
             question = "question";
             status = "";
         }
-        public Voting(string A,string B, string C, string D, int id, string Question, string Status)
+        public Voting(string A, string B, string C, string D, int id, string Question, string Status)
         {
             answerA = A;
             answerB = B;
@@ -65,4 +65,17 @@ namespace HttpClient
         }
 
     }
+    public class Vote
+    {
+        int votingId = 0;
+        char userAnswer = ' ';
+        public Vote() { }
+        public Vote(int id, char answer)
+        {
+            votingId = id;
+            userAnswer = answer;
+        }
+
+    }
 }
+

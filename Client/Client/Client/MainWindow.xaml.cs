@@ -65,6 +65,54 @@ namespace Client
                 votings.Items.Add(elem.id + ". " + elem.question);
             }
         }
+        /*
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var request = new RestRequest("login", Method.POST);
+            request.RequestFormat = RestSharp.DataFormat.Json;
+            var user = new User(loginBox.Text, passBox.Password);
+            request.AddJsonBody(user);
+            var response = HttpClient.HttpClient.MakeRequest(request);
+            if (!response.IsSuccessful)
+            {
+                incorrectLabel.Visibility = Visibility.Visible;
+            }
+            else
+            {
+
+                incorrectLabel.Visibility = Visibility.Hidden;
+                var token = JsonConvert.DeserializeObject<Token>(response.Content);
+                Console.WriteLine(token);
+                MainWindow mainWindow = new MainWindow(token, user);
+                mainWindow.Show();
+                this.Close();
+            }
+
+        }
+        */
+        private void Vote(char answer)
+        {
+            var votingName = votings.SelectedItem.ToString();
+            int votingId;
+            var converted = int.TryParse(votingName.Split('.')[0], out votingId);
+            if(converted)
+            {
+                var request = new RestRequest("vote", Method.POST);
+                request.RequestFormat = RestSharp.DataFormat.Json;
+                var vote = new Vote(votingId, answer);
+                request.AddJsonBody(vote);
+                var response = HttpClient.HttpClient.MakeRequest(request);
+                request.AddHeader("Authorization", "Bearer " + token.token);
+                if (response.IsSuccessful)
+                {
+                    MessageBox.Show("Pomyślnie oddano głos");
+                }
+                else
+                {
+                    MessageBox.Show("Wystąpił błąd przy oddawaniu głosowania");
+                }
+            }
+        }
         private void DisplaySelected(object sender, SelectionChangedEventArgs e)
         {
             var item = (ListBox)sender;
@@ -111,6 +159,26 @@ namespace Client
 
                 }
             }
+        }
+
+        private void AButtonClicked(object sender, RoutedEventArgs e)
+        {
+            Vote('A');
+        }
+
+        private void BButtonClicked(object sender, RoutedEventArgs e)
+        {
+            Vote('B');
+        }
+
+        private void CButtonClicked(object sender, RoutedEventArgs e)
+        {
+            Vote('C');
+        }
+
+        private void DButtonClicked(object sender, RoutedEventArgs e)
+        {
+            Vote('D');
         }
     }
 }

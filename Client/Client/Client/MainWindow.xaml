@@ -20,10 +20,10 @@
         <Button x:Name="allVotings" Content="Wszys." Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="112,448,0,0" VerticalAlignment="Top" Width="38" Height="22" Background="#FFF7E8D5"/>
         <TextBlock x:Name="votingDescription" Grid.Column="2" HorizontalAlignment="Left" Margin="0,21,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="329" Width="620" Background="#FFF7E8D5"><Run Text="Czy jesteś za wprowadzeniem rozszerzonego podatku na dżem wiśniowy"/><Run Language="pl-pl" Text=" czy malinowy"/><Run Text="?"/></TextBlock>
         <Rectangle Grid.Column="2" HorizontalAlignment="Left" Height="115" Margin="0,355,0,0" Stroke="Black" VerticalAlignment="Top" Width="620" Fill="#FFF7E8D5"/>
-        <Button x:Name="answerA" Content="Malinowy" Grid.Column="2" HorizontalAlignment="Left" Margin="10,364,0,0" VerticalAlignment="Top" Width="600"/>
-        <Button x:Name="answerC" Content="Nie mam zdania" Grid.Column="2" HorizontalAlignment="Left" Margin="10,414,0,0" VerticalAlignment="Top" Width="600"/>
-        <Button x:Name="answerB" Content="Wiśniowy" Grid.Column="2" HorizontalAlignment="Left" Margin="10,389,0,0" VerticalAlignment="Top" Width="600"/>
-        <Button x:Name="answerD" Content="Nie chcę wprowadzać podatku na żaden z wyżej wymienionych dżemów" Grid.Column="2" HorizontalAlignment="Left" Margin="10,439,0,0" VerticalAlignment="Top" Width="600"/>
+        <Button x:Name="answerA" Content="Malinowy" Grid.Column="2" HorizontalAlignment="Left" Margin="10,364,0,0" VerticalAlignment="Top" Width="600" Click="AButtonClicked"/>
+        <Button x:Name="answerC" Content="Nie mam zdania" Grid.Column="2" HorizontalAlignment="Left" Margin="10,414,0,0" VerticalAlignment="Top" Width="600" Click="CButtonClicked"/>
+        <Button x:Name="answerB" Content="Wiśniowy" Grid.Column="2" HorizontalAlignment="Left" Margin="10,389,0,0" VerticalAlignment="Top" Width="600" Click="BButtonClicked"/>
+        <Button x:Name="answerD" Content="Nie chcę wprowadzać podatku na żaden z wyżej wymienionych dżemów" Grid.Column="2" HorizontalAlignment="Left" Margin="10,439,0,0" VerticalAlignment="Top" Width="600" Click="DButtonClicked"/>
 
     </Grid>
 </Window>
