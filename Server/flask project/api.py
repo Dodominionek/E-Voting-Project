@@ -65,9 +65,11 @@ class Voting(db.Model):
     db.Column('answerC', db.String(256)),
     db.Column('answerD', db.String(256)),
     db.Column('status', db.String(64)),
+    db.Column('timeStart', db.String(64)),
+    db.Column('timeEnd', db.String(64)),
     sqlite_autoincrement=True)
 
-    def __init__(self, question, ownerId, answerA, answerB, answerC, answerD, status):
+    def __init__(self, question, ownerId, answerA, answerB, answerC, answerD, status, timeStart, timeEnd):
         self.question = question
         self.ownerId = ownerId
         self.answerA = answerA
@@ -75,10 +77,12 @@ class Voting(db.Model):
         self.answerC = answerC
         self.answerD = answerD
         self.status = status
+        self.timeStart = timeStart
+        self.timeEnd = timeEnd
 
 class VotingSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'ovnerId' ,'question', 'answerA', 'answerB', 'answerC', 'answerD', 'status')
+        fields = ('id', 'ovnerId' ,'question', 'answerA', 'answerB', 'answerC', 'answerD', 'status', 'timeStart', 'timeEnd')
         session = db.Session
 
 voting_schema = VotingSchema() 
@@ -348,7 +352,7 @@ class VotingManager(Resource):
                     voted = Voting.query.with_entities(Voting.id, Voting.question) \
                                         .join(UserVote, Voting.id == UserVote.votingId) \
                                         .filter_by(userId = user.id).all()
-                    all_votings = Voting.query.with_entities(Voting.id, Voting.question, Voting.answerA, Voting.answerB, Voting.answerC, Voting.answerD, Voting.status) \
+                    all_votings = Voting.query.with_entities(Voting.id, Voting.question, Voting.answerA, Voting.answerB, Voting.answerC, Voting.answerD, Voting.status, Voting.timeStart, Voting.timeEnd) \
                                         .filter_by(status = 'Created').all()
 
                 for voting1 in voted:
@@ -363,7 +367,7 @@ class VotingManager(Resource):
             if onlyQuestions:
                 votings = Voting.query.with_entities(Voting.id, Voting.question).all()
             else:
-                votings = Voting.query.with_entities(Voting.id, Voting.question, Voting.answerA, Voting.answerB, Voting.answerC, Voting.answerD, Voting.status).all()
+                votings = Voting.query.with_entities(Voting.id, Voting.question, Voting.answerA, Voting.answerB, Voting.answerC, Voting.answerD, Voting.status, Voting.timeStart, Voting.timeEnd).all()
             return make_response(jsonify(votings_schema.dump(votings)), 200)
 
         #votingId provided
@@ -425,12 +429,16 @@ class VotingManager(Resource):
             answerB = request.json['answerB']
             answerC = request.json['answerC']
             answerD = request.json['answerD']
+            timeStart = request.json['timeStart']
+            timeEnd = request.json['timeEnd']
         except Exception as _: 
             question = None
             answerA = None
             answerB = None
             answerC = None
             answerD = None
+            timeStart = None
+            timeEnd = None
 
         if not question or not answerA or not answerB:
             return make_response(jsonify({ 'Message': 'Must provide the proper data' }), 400)
@@ -440,7 +448,7 @@ class VotingManager(Resource):
         if user == None:
             return make_response(jsonify({ 'Message': 'User not exist!' }), 404)
 
-        voting = Voting(question, user.id, answerA, answerB, answerC, answerD, 'Created')
+        voting = Voting(question, user.id, answerA, answerB, answerC, answerD, 'Created', timeStart, timeEnd)
 
         db.session.add(voting)
         db.session.commit()
@@ -510,7 +518,9 @@ class ResultManager(Resource):
 class VoteManager(Resource):
     @staticmethod
     @jwt_required()
-    def post():        
+    def post():
+        voteTime = datetime.now()
+
         try:
             votingId = request.json['votingId']
             userAnswer = request.json['userAnswer']
@@ -526,12 +536,31 @@ class VoteManager(Resource):
             if voting.status == 'Ended':
                 return make_response(jsonify({'Message': f'Voting {votingId} has ended. No more votes can be casted'}), 403)
 
+            try:
+                votingStart = datetime.strptime(voting.timeStart, '%Y-%m-%d %H:%M:%S.%f')
+                votingEnd = datetime.strptime(voting.timeEnd, '%Y-%m-%d %H:%M:%S.%f')
+            except Exception as _:
+                votingStart = None
+                votingEnd = None
+
+            print(voteTime)
+            print(votingStart)
+            print(votingEnd)
+            
+
             if voting != None and userAnswer != None:
                 #check if user already voted
                 user = User.query.filter_by(id = get_jwt_identity()).first()
                 user_vote = UserVote.query.filter_by(votingId = votingId, userId = user.id).first()
                 if user_vote != None:
                     return make_response(jsonify({'Message': 'User already voted in this voting.'}), 403)
+
+                if votingStart != None:
+                    if voteTime < votingStart and votingStart != "":
+                        return make_response(jsonify({'Message': 'Voting has not started yet.'}), 403)
+                if votingEnd != None:
+                    if voteTime > votingEnd:
+                        return make_response(jsonify({'Message': 'Voting time is already over.'}), 403)
 
                 #TODO przy zakończeniu głosowania i podliczeniu głosów usunąć vote i userVote powiązane z tym głosowaniem
                 vote = Vote(votingId, userAnswer)
