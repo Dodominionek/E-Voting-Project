@@ -90,7 +90,7 @@ namespace Client
 
         }
         */
-        private void Vote(char answer)
+        private void Vote(string answer)
         {
             var votingName = votings.SelectedItem.ToString();
             int votingId;
@@ -99,10 +99,11 @@ namespace Client
             {
                 var request = new RestRequest("vote", Method.POST);
                 request.RequestFormat = RestSharp.DataFormat.Json;
+
+                request.AddHeader("Authorization", "Bearer " + token.token);
                 var vote = new Vote(votingId, answer);
                 request.AddJsonBody(vote);
                 var response = HttpClient.HttpClient.MakeRequest(request);
-                request.AddHeader("Authorization", "Bearer " + token.token);
                 if (response.IsSuccessful)
                 {
                     MessageBox.Show("Pomyślnie oddano głos");
@@ -163,22 +164,51 @@ namespace Client
 
         private void AButtonClicked(object sender, RoutedEventArgs e)
         {
-            Vote('A');
+            Vote("A");
         }
 
         private void BButtonClicked(object sender, RoutedEventArgs e)
         {
-            Vote('B');
+            Vote("B");
         }
 
         private void CButtonClicked(object sender, RoutedEventArgs e)
         {
-            Vote('C');
+            Vote("C");
         }
 
         private void DButtonClicked(object sender, RoutedEventArgs e)
         {
-            Vote('D');
+            Vote("D");
+        }
+
+        private void GetAvailableVotings(object sender, RoutedEventArgs e)
+        {
+            var request = new RestRequest("/voting?showUnvoted=True", Method.GET);
+            request.RequestFormat = RestSharp.DataFormat.Json;
+            request.AddHeader("Authorization", "Bearer " + token.token);
+            var response = HttpClient.HttpClient.MakeRequest(request);
+            votingsList = JsonConvert.DeserializeObject<List<Voting>>(response.Content);
+            if (!response.IsSuccessful)
+            {
+                if (MessageBox.Show("Dane nie zostały poprawnie wczytane. Wczytać ponownie?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                {
+                    Init();
+                }
+                else
+                {
+                    System.Windows.Application.Current.Shutdown();
+                }
+            }
+            else
+            {
+                UpdateList();
+            }
+        }
+
+        private void GetAllVotings(object sender, RoutedEventArgs e)
+        {
+            Init();
         }
     }
 }

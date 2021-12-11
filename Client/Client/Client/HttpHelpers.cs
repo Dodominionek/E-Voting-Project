@@ -67,13 +67,15 @@ namespace HttpClient
     }
     public class Vote
     {
-        int votingId = 0;
-        char userAnswer = ' ';
-        public Vote() { }
-        public Vote(int id, char answer)
+        public int votingId;
+        public string userAnswer;
+        public Vote() 
+        { 
+        }
+        public Vote(int id, string answer)
         {
-            votingId = id;
-            userAnswer = answer;
+            this.votingId = id;
+            this.userAnswer = answer;
         }
 
     }
