@@ -32,13 +32,18 @@ namespace HttpClient
     }
     public class Voting
     {
-        /*"answerA": "GIT",
-        "answerB": "JWT",
-        "answerC": "PUT",
-        "answerD": "PIS",
-        "id": 2,
-        "question": "Co tam wariacie?",
-        "status": "Created"*/
+        /*
+         *  "answerA": "Gitówa",
+         "answerB": "Kozówa",
+         "answerC": "Trzecia opcja",
+         "answerD": "",
+         "id": 1,
+         "question": "LOL2",
+         "status": "Created",
+         "timeEnd": "2021-12-10 20:00:56.550604",
+         "timeStart": "2021-12-10 19:58:56.550604"
+         */
+
         public string answerA, answerB, answerC, answerD;
         public int id;
         public string question;

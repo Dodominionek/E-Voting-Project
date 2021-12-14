@@ -117,6 +117,10 @@ namespace Client
         private void DisplaySelected(object sender, SelectionChangedEventArgs e)
         {
             var item = (ListBox)sender;
+            if(item.SelectedItem==null)
+            {
+                return;
+            }
             var votingName = item.SelectedItem.ToString();
             var votingIndex = votingName.Split('.')[0];
             foreach (Voting elem in votingsList)
@@ -188,7 +192,15 @@ namespace Client
             request.RequestFormat = RestSharp.DataFormat.Json;
             request.AddHeader("Authorization", "Bearer " + token.token);
             var response = HttpClient.HttpClient.MakeRequest(request);
-            votingsList = JsonConvert.DeserializeObject<List<Voting>>(response.Content);
+            var templist = JsonConvert.DeserializeObject<List<Voting>>(response.Content);
+            //votingsList
+            foreach(Voting vote in templist)
+            {
+                if(vote.status!="Ended")
+                {
+
+                }
+            }
             if (!response.IsSuccessful)
             {
                 if (MessageBox.Show("Dane nie zostały poprawnie wczytane. Wczytać ponownie?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
@@ -202,6 +214,7 @@ namespace Client
             }
             else
             {
+
                 UpdateList();
             }
         }
