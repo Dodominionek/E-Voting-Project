@@ -36,6 +36,7 @@ namespace Client
             Init();
         }
         void Init() {
+            EnableButtons();
             var request = new RestRequest("/voting?username=" + user.username, Method.GET);
             request.RequestFormat = RestSharp.DataFormat.Json;
             request.AddHeader("Authorization", "Bearer " + token.token);
@@ -132,32 +133,29 @@ namespace Client
                     answerB.Content = elem.answerB;
                     answerC.Content = elem.answerC;
                     answerD.Content = elem.answerD;
-                    answerA.IsEnabled = true;
-                    answerB.IsEnabled = true;
-                    answerC.IsEnabled = true;
-                    answerD.IsEnabled = true;
+   
                     answerA.Visibility = Visibility.Visible;
                     answerB.Visibility = Visibility.Visible;
                     answerC.Visibility = Visibility.Visible;
                     answerD.Visibility = Visibility.Visible;
                     if (elem.answerA.Length == 0)
                     {
-                        answerA.IsEnabled = false;
+                        
                         answerA.Visibility = Visibility.Hidden;
                     }
                     if (elem.answerB.Length == 0)
                     {
-                        answerB.IsEnabled = false;
+                        
                         answerB.Visibility = Visibility.Hidden;
                     }
                     if (elem.answerC.Length == 0)
                     {
-                        answerC.IsEnabled = false;
+                        
                         answerC.Visibility = Visibility.Hidden;
                     }
                     if (elem.answerD.Length == 0)
                     {
-                        answerD.IsEnabled = false;
+                        
                         answerD.Visibility = Visibility.Hidden;
                     }
                     break;
@@ -188,17 +186,19 @@ namespace Client
 
         private void GetAvailableVotings(object sender, RoutedEventArgs e)
         {
+            EnableButtons();
             var request = new RestRequest("/voting?showUnvoted=True", Method.GET);
             request.RequestFormat = RestSharp.DataFormat.Json;
             request.AddHeader("Authorization", "Bearer " + token.token);
             var response = HttpClient.HttpClient.MakeRequest(request);
             var templist = JsonConvert.DeserializeObject<List<Voting>>(response.Content);
             //votingsList
+            votingsList.Clear();
             foreach(Voting vote in templist)
             {
                 if(vote.status!="Ended")
                 {
-
+                    votingsList.Add(vote);
                 }
             }
             if (!response.IsSuccessful)
@@ -218,10 +218,95 @@ namespace Client
                 UpdateList();
             }
         }
+        private void GetEndedVotings(object sender, RoutedEventArgs e)
+        {
+            DisableButtons();
+            var request = new RestRequest("/voting?username=", Method.GET);
+            request.RequestFormat = RestSharp.DataFormat.Json;
+            request.AddHeader("Authorization", "Bearer " + token.token);
+            var response = HttpClient.HttpClient.MakeRequest(request);
+            var templist = JsonConvert.DeserializeObject<List<Voting>>(response.Content);
+            //votingsList
+            votingsList.Clear();
+            foreach (Voting vote in templist)
+            {
+                if (vote.status == "Ended")
+                {
+                    votingsList.Add(vote);
+                }
+            }
+            if (!response.IsSuccessful)
+            {
+                if (MessageBox.Show("Dane nie zostały poprawnie wczytane. Wczytać ponownie?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                {
+                    Init();
+                }
+                else
+                {
+                    System.Windows.Application.Current.Shutdown();
+                }
+            }
+            else
+            {
 
+                UpdateList();
+            }
+        }
+        private void GetActiveVotings(object sender, RoutedEventArgs e)
+        {
+            EnableButtons();
+            var request = new RestRequest("/voting?username=", Method.GET);
+            request.RequestFormat = RestSharp.DataFormat.Json;
+            request.AddHeader("Authorization", "Bearer " + token.token);
+            var response = HttpClient.HttpClient.MakeRequest(request);
+            var templist = JsonConvert.DeserializeObject<List<Voting>>(response.Content);
+            //votingsList
+            votingsList.Clear();
+            foreach (Voting vote in templist)
+            {
+                if (vote.status != "Ended")
+                {
+                    votingsList.Add(vote);
+                }
+            }
+            if (!response.IsSuccessful)
+            {
+                if (MessageBox.Show("Dane nie zostały poprawnie wczytane. Wczytać ponownie?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                {
+                    Init();
+                }
+                else
+                {
+                    System.Windows.Application.Current.Shutdown();
+                }
+            }
+            else
+            {
+
+                UpdateList();
+            }
+        }
         private void GetAllVotings(object sender, RoutedEventArgs e)
         {
             Init();
+        }
+        private void EnableButtons()
+        {
+            answerA.IsEnabled = true;
+            answerB.IsEnabled = true;
+            answerC.IsEnabled = true;
+            answerD.IsEnabled = true;
+        }
+        private void DisableButtons()
+        {
+            answerA.IsEnabled = false;
+            answerB.IsEnabled = false;
+            answerC.IsEnabled = false;
+            answerD.IsEnabled = false;
+        }
+        private void CreateNewVoting()
+        {
+
         }
     }
 }
