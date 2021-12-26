@@ -3,10 +3,35 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:Client"
         mc:Ignorable="d"
-        Title="AddVoting" Height="450" Width="800">
-    <Grid x:Name="AddVotingWindow" Background="#FFEAD5BD">
-        <Button Content="Button" HorizontalAlignment="Left" Margin="10,404,0,0" VerticalAlignment="Top" Width="70"/>
+        Title="Dodaj głosowanie" Height="458" Width="910">
+    <Grid x:Name="AddVotingWindow" Background="#FFEAD5BD" Margin="0,0,0,-6">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="0*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0*"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="10,383,0,0" VerticalAlignment="Top" Width="70" Height="20" Grid.Column="1"/>
+        <TextBox HorizontalAlignment="Center" Margin="0,47,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="876" Height="73" Grid.Column="1"/>
+        <Label Content="Treść głosowania" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="10,21,0,0" VerticalAlignment="Top" Height="26" Width="100"/>
+        <Label Content="Odpowiedź A" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="10,125,0,0" VerticalAlignment="Top" Height="26" Width="82"/>
+        <TextBox HorizontalAlignment="Left" Margin="10,156,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="547" Height="27" Grid.Column="1"/>
+        <Label Content="Odpowiedź B" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="10,186,0,0" VerticalAlignment="Top" Height="26" Width="81"/>
+        <TextBox HorizontalAlignment="Left" Margin="10,217,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="547" Height="27" Grid.Column="1"/>
+        <Label Content="Odpowiedź C" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="10,247,0,0" VerticalAlignment="Top" Height="26" Width="81"/>
+        <TextBox HorizontalAlignment="Left" Margin="10,278,0,143" Text="" TextWrapping="Wrap" Width="547" Grid.Column="1"/>
+        <Label Content="Odpowiedź D" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="10,307,0,0" VerticalAlignment="Top" Height="26" Width="82"/>
+        <TextBox HorizontalAlignment="Left" Margin="10,338,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="547" Height="27" Grid.Column="1"/>
+        <GroupBox Grid.ColumnSpan="2" Header="Czas rozpoczęcia głosowania
+                  " Margin="567,217,17,25">
+            <CheckBox Content="Użyj obecnego" HorizontalAlignment="Left" Margin="198,0,0,0" VerticalAlignment="Top" Height="15" Width="106"/>
+        </GroupBox>
+        <TextBox Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="583,165,0,0" Text="TextBox" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="583,247,0,0" Text="TextBox" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
     </Grid>
 </Window>

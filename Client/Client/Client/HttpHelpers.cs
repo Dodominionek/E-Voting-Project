@@ -74,9 +74,8 @@ namespace HttpClient
     {
         public int votingId;
         public string userAnswer;
-        public Vote() 
-        { 
-        }
+
+        public Vote() { }
         public Vote(int id, string answer)
         {
             this.votingId = id;
