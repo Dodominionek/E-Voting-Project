@@ -609,13 +609,16 @@ def check_voting_times():
             if voting.timeStart != '' and voting.timeEnd != '':
                 votingStart = datetime.strptime(voting.timeStart, '%Y-%m-%d %H:%M:%S.%f')
                 votingEnd = datetime.strptime(voting.timeEnd, '%Y-%m-%d %H:%M:%S.%f')
+                votingId = voting.id
                 newStatus = ''
-                if votingStart < time and votingEnd < time:
+                if votingStart < time and votingEnd > time:
                     newStatus = 'Active'
-                elif votingEnd > time:
+                elif votingEnd < time:
                     newStatus = 'Ended'
                 if newStatus != '':
-                    print('Update status here')
+                    matchingVoting = Voting.query.filter_by(id = votingId).first()
+                    matchingVoting.status = newStatus
+                    db.session.commit()
 
 
 
