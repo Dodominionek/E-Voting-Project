@@ -606,16 +606,17 @@ def check_voting_times():
         time = datetime.now()
         votings = Voting.query.with_entities(Voting.id, Voting.timeStart, Voting.timeEnd, Voting.status).all()
         for voting in votings:
-            if voting.timeStart != None and voting.timeEnd != None:
+            if voting.timeStart != '' and voting.timeEnd != '':
                 votingStart = datetime.strptime(voting.timeStart, '%Y-%m-%d %H:%M:%S.%f')
                 votingEnd = datetime.strptime(voting.timeEnd, '%Y-%m-%d %H:%M:%S.%f')
+                newStatus = ''
                 if votingStart < time and votingEnd < time:
-                    print()
-                    print(voting.status)
-                    print()
-                    voting.status = 'Active'
+                    newStatus = 'Active'
                 elif votingEnd > time:
-                    voting.status = 'Ended'
+                    newStatus = 'Ended'
+                if newStatus != '':
+                    print('Update status here')
+
 
 
 
