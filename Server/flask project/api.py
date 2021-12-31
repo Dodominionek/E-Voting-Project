@@ -595,11 +595,30 @@ def delete_expired_tokens():
             db.session.commit()
 
 def schedule_tokens():
-    while(True):
+    while True:
         # print(threading.active_count())
         with app.app_context():
             delete_expired_tokens()
         time.sleep(1)
+
+def check_voting_times():
+    while True:
+        time = datetime.now()
+        votings = Voting.query.with_entities(Voting.id, Voting.timeStart, Voting.timeEnd, Voting.status).all()
+        for voting in votings:
+            if voting.timeStart != None and voting.timeEnd != None:
+                votingStart = datetime.strptime(voting.timeStart, '%Y-%m-%d %H:%M:%S.%f')
+                votingEnd = datetime.strptime(voting.timeEnd, '%Y-%m-%d %H:%M:%S.%f')
+                if votingStart < time and votingEnd < time:
+                    print()
+                    print(voting.status)
+                    print()
+                    voting.status = 'Active'
+                elif votingEnd > time:
+                    voting.status = 'Ended'
+
+
+
 
 ####### Resource Mapping ##############
 
@@ -616,8 +635,12 @@ if __name__ == '__main__':
         t2 = threading.Thread(target=schedule_tokens)
         t2.daemon = True
         t2.start()
-       
+
+        t3 = threading.Thread(target=check_voting_times)       
+        t3.start()
+
         app.run(debug=True)
     except Exception as ex:
-        t2.join
+        t2.join()
+        t3.join()
         print(ex)
