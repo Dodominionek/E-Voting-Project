@@ -24,7 +24,7 @@
         <Button x:Name="answerC" Content="Nie mam zdania" Grid.Column="2" HorizontalAlignment="Left" Margin="10,414,0,0" VerticalAlignment="Top" Width="600" Click="CButtonClicked"/>
         <Button x:Name="answerB" Content="Wiśniowy" Grid.Column="2" HorizontalAlignment="Left" Margin="10,389,0,0" VerticalAlignment="Top" Width="600" Click="BButtonClicked"/>
         <Button x:Name="answerD" Content="Nie chcę wprowadzać podatku na żaden z wyżej wymienionych dżemów" Grid.Column="2" HorizontalAlignment="Left" Margin="10,439,0,0" VerticalAlignment="Top" Width="600" Click="DButtonClicked"/>
-        <Button x:Name="activeVotings_Copy" Content="Nowe głosowanie" HorizontalAlignment="Left" Margin="499,2,0,0" VerticalAlignment="Top" Width="121" Height="22" Background="#FFF7E8D5" Click="GetActiveVotings" Grid.Column="2"/>
+        <Button x:Name="activeVotings_Copy" Content="Nowe głosowanie" HorizontalAlignment="Left" Margin="499,2,0,0" VerticalAlignment="Top" Width="121" Height="22" Background="#FFF7E8D5" Click="CreateNewVoting" Grid.Column="2"/>
 
     </Grid>
 </Window>
