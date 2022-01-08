@@ -16,8 +16,8 @@
             <ColumnDefinition Width="0*"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="10,383,0,0" VerticalAlignment="Top" Width="70" Height="20" Grid.Column="1"/>
-        <TextBox HorizontalAlignment="Center" Margin="0,47,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="876" Height="73" Grid.Column="1"/>
+        <Button Content="Powrót" HorizontalAlignment="Left" Margin="595,345,0,0" VerticalAlignment="Top" Width="77" Height="20" Grid.Column="1"/>
+        <TextBox HorizontalAlignment="Center" Margin="0,47,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="890" Height="73" Grid.Column="1"/>
         <Label Content="Treść głosowania" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="10,21,0,0" VerticalAlignment="Top" Height="26" Width="100"/>
         <Label Content="Odpowiedź A" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="10,125,0,0" VerticalAlignment="Top" Height="26" Width="82"/>
         <TextBox HorizontalAlignment="Left" Margin="10,156,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="547" Height="27" Grid.Column="1"/>
@@ -28,10 +28,17 @@
         <Label Content="Odpowiedź D" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="10,307,0,0" VerticalAlignment="Top" Height="26" Width="82"/>
         <TextBox HorizontalAlignment="Left" Margin="10,338,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="547" Height="27" Grid.Column="1"/>
         <GroupBox Grid.ColumnSpan="2" Header="Czas rozpoczęcia głosowania
-                  " Margin="567,217,17,25">
-            <CheckBox Content="Użyj obecnego" HorizontalAlignment="Left" Margin="198,0,0,0" VerticalAlignment="Top" Height="15" Width="106"/>
-        </GroupBox>
-        <TextBox Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="583,165,0,0" Text="TextBox" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <TextBox Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="583,247,0,0" Text="TextBox" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                  " Margin="595,127,0,204" HorizontalAlignment="Left" Width="295"/>
+        <TextBox HorizontalAlignment="Left" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Margin="612,170,0,0" Grid.ColumnSpan="2"/>
+        <Label Content="Data: DD-MM-RRRR" HorizontalAlignment="Left" Margin="612,144,0,278" Grid.ColumnSpan="2"/>
+        <TextBox HorizontalAlignment="Left" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Margin="755,170,0,0" Grid.ColumnSpan="2"/>
+        <Label Content="Godzina: GG:MM:SS" HorizontalAlignment="Left" Margin="755,144,0,278" Grid.ColumnSpan="2"/>
+        <CheckBox Content="Użyj obecnego czasu" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="612,199,0,0" VerticalAlignment="Top"/>
+        <GroupBox Grid.ColumnSpan="2" Header="Czas zakończenia głosowania                   " Margin="595,254,0,115" HorizontalAlignment="Left" Width="295"/>
+        <TextBox HorizontalAlignment="Left" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Margin="612,297,0,0" Grid.ColumnSpan="2"/>
+        <Label Content="Data: DD-MM-RRRR" HorizontalAlignment="Left" Margin="612,271,0,151" Grid.ColumnSpan="2"/>
+        <TextBox HorizontalAlignment="Left" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Margin="755,297,0,0" Grid.ColumnSpan="2"/>
+        <Label Content="Godzina: GG:MM:SS" HorizontalAlignment="Left" Margin="755,271,0,151" Grid.ColumnSpan="2"/>
+        <Button Content="Zatwierdź" HorizontalAlignment="Left" Margin="815,345,0,0" VerticalAlignment="Top" Width="78" Height="20" Grid.Column="1"/>
     </Grid>
 </Window>
