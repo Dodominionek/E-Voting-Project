@@ -5,6 +5,45 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security;
 
+namespace SpecialVoting
+{
+    public class Voting
+    {
+        /*
+         *  "answerA": "Gitówa",
+         "answerB": "Kozówa",
+         "answerC": "Trzecia opcja",
+         "answerD": "",
+         "id": 1,
+         "question": "LOL2",
+         "status": "Created",
+         "timeEnd": "2021-12-10 20:00:56.550604",
+         "timeStart": "2021-12-10 19:58:56.550604"
+         */
+        public string answerA, answerB, answerC, answerD;
+        public string timeEnd, timeStart;
+        public string question;
+        public Voting()
+        {
+            answerA = "a";
+            answerB = "b";
+            answerC = "c";
+            answerD = "d";
+            question = "question";
+        }
+        public Voting(string A, string B, string C, string D, string Question,string start,string end)
+        {
+            answerA = A;
+            answerB = B;
+            answerC = C;
+            answerD = D;
+            question = Question;
+            timeStart = start;
+            timeEnd = end;
+        }
+
+    }
+}
 namespace HttpClient
 {
     public class User

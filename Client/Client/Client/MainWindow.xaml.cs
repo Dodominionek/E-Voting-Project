@@ -66,31 +66,7 @@ namespace Client
                 votings.Items.Add(elem.id + ". " + elem.question);
             }
         }
-        /*
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            var request = new RestRequest("login", Method.POST);
-            request.RequestFormat = RestSharp.DataFormat.Json;
-            var user = new User(loginBox.Text, passBox.Password);
-            request.AddJsonBody(user);
-            var response = HttpClient.HttpClient.MakeRequest(request);
-            if (!response.IsSuccessful)
-            {
-                incorrectLabel.Visibility = Visibility.Visible;
-            }
-            else
-            {
 
-                incorrectLabel.Visibility = Visibility.Hidden;
-                var token = JsonConvert.DeserializeObject<Token>(response.Content);
-                Console.WriteLine(token);
-                MainWindow mainWindow = new MainWindow(token, user);
-                mainWindow.Show();
-                this.Close();
-            }
-
-        }
-        */
         private void Vote(string answer)
         {
             var votingName = votings.SelectedItem.ToString();
@@ -140,22 +116,18 @@ namespace Client
                     answerD.Visibility = Visibility.Visible;
                     if (elem.answerA.Length == 0)
                     {
-                        
                         answerA.Visibility = Visibility.Hidden;
                     }
                     if (elem.answerB.Length == 0)
                     {
-                        
                         answerB.Visibility = Visibility.Hidden;
                     }
                     if (elem.answerC.Length == 0)
                     {
-                        
                         answerC.Visibility = Visibility.Hidden;
                     }
                     if (elem.answerD.Length == 0)
                     {
-                        
                         answerD.Visibility = Visibility.Hidden;
                     }
                     break;
@@ -304,9 +276,11 @@ namespace Client
             answerC.IsEnabled = false;
             answerD.IsEnabled = false;
         }
-        private void CreateNewVoting()
+        private void CreateNewVoting(object sender, RoutedEventArgs e)
         {
-
+            AddVoting addVoting = new AddVoting(token, user);
+            addVoting.Show();
+            this.Close();
         }
     }
 }
