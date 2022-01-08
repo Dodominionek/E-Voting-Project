@@ -247,10 +247,17 @@ namespace Client
         #endregion
         private void SendVoting()
         {
+            var startDate = startDateBox.Text;
+            var endDate = endDateBox.Text;
+            var tmp = startDate.Split("-");
+            //"timeStart": "2021-12-10 19:58:56.550604",
+            startDate = tmp[2] + "-" + tmp[1] + "-" + tmp[0];
+            tmp = endDate.Split("-");
+            endDate = tmp[2] + "-" + tmp[1] + "-" + tmp[0];
             var request = new RestRequest("/voting", Method.POST);
             request.RequestFormat = RestSharp.DataFormat.Json;
             request.AddHeader("Authorization", "Bearer " + token.token);
-            var voting = new SpecialVoting.Voting(answerABox.Text,answerBBox.Text,answerCBox.Text,answerDBox.Text,votingContentBox.Text,startDateBox.Text+" "+ startTimeBox.Text+".000001", endDateBox.Text + " " + endTimeBox.Text + ".000001");
+            var voting = new SpecialVoting.Voting(answerABox.Text,answerBBox.Text,answerCBox.Text,answerDBox.Text,votingContentBox.Text,startDate+" "+ startTimeBox.Text+".000001", endDate + " " + endTimeBox.Text + ".000001");
             request.AddJsonBody(voting);
             var response = HttpClient.HttpClient.MakeRequest(request);
             if (!response.IsSuccessful)
