@@ -9,17 +9,6 @@ namespace SpecialVoting
 {
     public class Voting
     {
-        /*
-         *  "answerA": "Gitówa",
-         "answerB": "Kozówa",
-         "answerC": "Trzecia opcja",
-         "answerD": "",
-         "id": 1,
-         "question": "LOL2",
-         "status": "Created",
-         "timeEnd": "2021-12-10 20:00:56.550604",
-         "timeStart": "2021-12-10 19:58:56.550604"
-         */
         public string answerA, answerB, answerC, answerD;
         public string timeEnd, timeStart;
         public string question;
@@ -41,7 +30,6 @@ namespace SpecialVoting
             timeStart = start;
             timeEnd = end;
         }
-
     }
 }
 namespace HttpClient
@@ -71,18 +59,6 @@ namespace HttpClient
     }
     public class Voting
     {
-        /*
-         *  "answerA": "Gitówa",
-         "answerB": "Kozówa",
-         "answerC": "Trzecia opcja",
-         "answerD": "",
-         "id": 1,
-         "question": "LOL2",
-         "status": "Created",
-         "timeEnd": "2021-12-10 20:00:56.550604",
-         "timeStart": "2021-12-10 19:58:56.550604"
-         */
-
         public string answerA, answerB, answerC, answerD;
         public int id;
         public string question;
@@ -108,6 +84,27 @@ namespace HttpClient
             status = Status;
         }
 
+    }
+    public class Result
+    {
+        public int votingId, answerA, answerB, answerC, answerD;
+        public Result()
+        {
+            answerA = 0;
+            answerB = 0;
+            answerC = 0;
+            answerD = 0;
+            votingId = 0;
+
+        }
+        public Result( int id, int a, int b, int c, int d)
+        {
+            votingId = id;
+            answerA = a;
+            answerB = b;
+            answerC = c;
+            answerD = d;
+        }
     }
     public class Vote
     {

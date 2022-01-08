@@ -194,7 +194,7 @@ namespace Client
         }
         private static bool CheckDate(string inputDate)
         {
-            if (Regex.IsMatch(inputDate, @"^([0-9]{4})(-(0[0-9]|1[0-2]))(-([0-2][0-9]|[3[0-1]))$"))
+            if (Regex.IsMatch(inputDate, @"^(([0-2][0-9]|[3[0-1])-(0[0-9]|1[0-2])-([0-9]{4}))$"))
             {
                 return true;
             }
@@ -264,5 +264,11 @@ namespace Client
 
         }
 
+        private void returnButtonClicked(object sender, RoutedEventArgs e)
+        {
+            MainWindow mainWindow = new MainWindow(token, user);
+            mainWindow.Show();
+            this.Close();
+        }
     }
 }

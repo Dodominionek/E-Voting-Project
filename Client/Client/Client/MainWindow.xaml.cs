@@ -102,6 +102,14 @@ namespace Client
             var votingIndex = votingName.Split('.')[0];
             foreach (Voting elem in votingsList)
             {
+                if(elem.status=="Ended")
+                {
+                    DisableButtons();
+                }
+                else
+                {
+                    EnableButtons();
+                }
                 if (String.Equals(elem.id.ToString(), votingIndex))
                 {
                     votingDescription.Text = elem.question;
@@ -207,6 +215,7 @@ namespace Client
                     votingsList.Add(vote);
                 }
             }
+            AddResults();
             if (!response.IsSuccessful)
             {
                 if (MessageBox.Show("Dane nie zostały poprawnie wczytane. Wczytać ponownie?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
@@ -220,9 +229,34 @@ namespace Client
             }
             else
             {
-
                 UpdateList();
             }
+        }
+        private void AddResults()
+        {
+            foreach(Voting voting in votingsList)
+            {
+                var result = GetResult(voting.id);
+                voting.question = "[ZAKOŃCZONE]     "+voting.question;
+                var votes = result.answerA + result.answerB + result.answerC + result.answerD;
+                if(votes!=0)
+                {
+                    voting.answerA = voting.answerA + "   " + result.answerA.ToString() + " - " + ((result.answerA * 100) / (votes)).ToString() + "%";
+                    voting.answerB = voting.answerB + "   " + result.answerB.ToString() + " - " + ((result.answerB * 100) / (votes)).ToString() + "%";
+                    voting.answerC = voting.answerC + "   " + result.answerC.ToString() + " - " + ((result.answerC * 100) / (votes)).ToString() + "%";
+                    voting.answerD = voting.answerD + "   " + result.answerD.ToString() + " - " + ((result.answerD * 100) / (votes)).ToString() + "%";
+                }
+               
+            }
+        }
+        private Result GetResult(int id)
+        {
+            var request = new RestRequest("/result?votingId=" + id.ToString(), Method.GET);
+            request.RequestFormat = RestSharp.DataFormat.Json;
+            request.AddHeader("Authorization", "Bearer " + token.token);
+            var response = HttpClient.HttpClient.MakeRequest(request);
+            var result = JsonConvert.DeserializeObject<Result>(response.Content);
+            return result;
         }
         private void GetActiveVotings(object sender, RoutedEventArgs e)
         {

@@ -16,7 +16,7 @@
             <ColumnDefinition Width="0*"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Button x:Name="returnButton" Content="Powrót" Margin="20,400,0,18" Grid.Column="1" Width="160" Height="32" HorizontalAlignment="Left"/>
+        <Button x:Name="returnButton" Content="Powrót" Margin="20,400,0,18" Grid.Column="1" Width="160" Height="32" HorizontalAlignment="Left" Click="returnButtonClicked"/>
         <TextBox x:Name="votingContentBox" Margin="20,47,20,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Height="73" Grid.Column="1" LostFocus="VerifyVotingContent" TextChanged="VerifyVotingContent"/>
         <Label Content="Treść głosowania" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="20,21,0,0" VerticalAlignment="Top" Height="26" Width="100"/>
         <Label Content="Odpowiedź A" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="20,125,0,0" VerticalAlignment="Top" Height="26" Width="82"/>
