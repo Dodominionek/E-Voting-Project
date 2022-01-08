@@ -6,8 +6,8 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:Client"
         mc:Ignorable="d"
-        Title="Dodaj głosowanie" Height="485" Width="800" MinWidth="800" MaxWidth="800" MinHeight="485" MaxHeight="485">
-    <Grid x:Name="AddVotingWindow" Background="#FFEAD5BD" Margin="0,0,0,0" Height="450" VerticalAlignment="Top" Width="800" HorizontalAlignment="Left" MinWidth="800" MaxWidth="800" MinHeight="450" MaxHeight="450">
+        Title="Dodaj głosowanie" Height="458" Width="910">
+    <Grid x:Name="AddVotingWindow" Background="#FFEAD5BD" Margin="0,0,0,-6">
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition Height="0*"/>
@@ -16,29 +16,22 @@
             <ColumnDefinition Width="0*"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Button x:Name="returnButton" Content="Powrót" Margin="20,400,0,18" Grid.Column="1" Width="160" Height="32" HorizontalAlignment="Left"/>
-        <TextBox x:Name="votingContentBox" Margin="20,47,20,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Height="73" Grid.Column="1" LostFocus="VerifyVotingContent" TextChanged="VerifyVotingContent"/>
-        <Label Content="Treść głosowania" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="20,21,0,0" VerticalAlignment="Top" Height="26" Width="100"/>
-        <Label Content="Odpowiedź A" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="20,125,0,0" VerticalAlignment="Top" Height="26" Width="82"/>
-        <TextBox x:Name="answerABox" Margin="20,0,0,267" Text="" TextWrapping="Wrap" VerticalAlignment="Bottom" Height="26" Grid.Column="1" LostFocus="AnswerALostFocus" HorizontalAlignment="Left" Width="450" IsEnabled="False"/>
-        <Label Content="Odpowiedź B" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="20,186,0,0" VerticalAlignment="Top" Height="26" Width="81"/>
-        <TextBox x:Name="answerBBox" Margin="20,0,0,206" Text="" TextWrapping="Wrap" VerticalAlignment="Bottom" Height="27" Grid.Column="1" HorizontalAlignment="Left" Width="457" UseLayoutRounding="True" IsEnabled="False" LostFocus="AnswerBLostFocus"/>
-        <Label Content="Odpowiedź C" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="20,247,0,0" VerticalAlignment="Top" Height="26" Width="81"/>
-        <Label Content="Odpowiedź D" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="20,308,0,0" VerticalAlignment="Top" Height="26" Width="82"/>
-        <TextBox x:Name="answerDBox" Margin="20,0,0,87" Text="" TextWrapping="Wrap" VerticalAlignment="Bottom" Height="27" Grid.Column="1" HorizontalAlignment="Left" Width="457" UseLayoutRounding="True" IsEnabled="False"/>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="10,383,0,0" VerticalAlignment="Top" Width="70" Height="20" Grid.Column="1"/>
+        <TextBox HorizontalAlignment="Center" Margin="0,47,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="876" Height="73" Grid.Column="1"/>
+        <Label Content="Treść głosowania" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="10,21,0,0" VerticalAlignment="Top" Height="26" Width="100"/>
+        <Label Content="Odpowiedź A" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="10,125,0,0" VerticalAlignment="Top" Height="26" Width="82"/>
+        <TextBox HorizontalAlignment="Left" Margin="10,156,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="547" Height="27" Grid.Column="1"/>
+        <Label Content="Odpowiedź B" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="10,186,0,0" VerticalAlignment="Top" Height="26" Width="81"/>
+        <TextBox HorizontalAlignment="Left" Margin="10,217,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="547" Height="27" Grid.Column="1"/>
+        <Label Content="Odpowiedź C" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="10,247,0,0" VerticalAlignment="Top" Height="26" Width="81"/>
+        <TextBox HorizontalAlignment="Left" Margin="10,278,0,143" Text="" TextWrapping="Wrap" Width="547" Grid.Column="1"/>
+        <Label Content="Odpowiedź D" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="10,307,0,0" VerticalAlignment="Top" Height="26" Width="82"/>
+        <TextBox HorizontalAlignment="Left" Margin="10,338,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="547" Height="27" Grid.Column="1"/>
         <GroupBox Grid.ColumnSpan="2" Header="Czas rozpoczęcia głosowania
-                  " Margin="483,119,20,193"/>
-        <TextBox x:Name="startTimeBox" Grid.ColumnSpan="2" Margin="632,183,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="18" HorizontalAlignment="Left" Width="120" LostFocus="CheckTime"/>
-        <TextBox x:Name="startDateBox" Grid.ColumnSpan="2" Margin="507,183,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" HorizontalAlignment="Left" LostFocus="CheckDate"/>
-        <Label Content="Data (RRRR-DD-MM)" Margin="503,147,0,265" Grid.ColumnSpan="2" HorizontalAlignment="Left" Width="122"/>
-        <Label Content="Godzina (GG:MM:SS)" Margin="634,145,0,267" Grid.ColumnSpan="2" HorizontalAlignment="Left" Width="120"/>
-        <GroupBox Grid.ColumnSpan="2" Header="Czas zakończenia głosowania                   " Margin="483,253,20,68"/>
-        <TextBox x:Name="endTimeBox" Grid.ColumnSpan="2" Margin="632,324,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="17" Width="120" HorizontalAlignment="Left" LostFocus="CheckTime"/>
-        <TextBox x:Name="endDateBox" Grid.ColumnSpan="2" Margin="503,323,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" HorizontalAlignment="Left" d:IsLocked="True" LostFocus="CheckDate"/>
-        <Label Content="Data (RRRR-DD-MM)" Margin="503,288,0,132" Grid.ColumnSpan="2" HorizontalAlignment="Left" Width="122"/>
-        <Label Content="Godzina (GG:MM:SS)" Margin="632,285,0,126" Grid.ColumnSpan="2" HorizontalAlignment="Left" Width="120"/>
-        <CheckBox x:Name="useCurrentDateCheck" Content="Użyj obecnego czasu" Margin="507,210,0,206" Grid.ColumnSpan="2" HorizontalAlignment="Left" Width="148" Checked="UseCurrentTime" Unchecked="DateUnchecked"/>
-        <Button x:Name="addVotingButton" Content="Dodaj głosowanie" Margin="0,0,20,20" Grid.Column="1" Click="CreateVoting" Height="32" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="160"/>
-        <TextBox x:Name="answerCBox" Margin="20,0,0,145" Text="" TextWrapping="Wrap" VerticalAlignment="Bottom" Height="27" Grid.Column="1" HorizontalAlignment="Left" Width="457" UseLayoutRounding="True" IsEnabled="False" LostFocus="AnswerCLostFocus"/>
+                  " Margin="567,217,17,25">
+            <CheckBox Content="Użyj obecnego" HorizontalAlignment="Left" Margin="198,0,0,0" VerticalAlignment="Top" Height="15" Width="106"/>
+        </GroupBox>
+        <TextBox Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="583,165,0,0" Text="TextBox" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="583,247,0,0" Text="TextBox" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
     </Grid>
 </Window>
