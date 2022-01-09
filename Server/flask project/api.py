@@ -615,6 +615,21 @@ def check_voting_times():
                     newStatus = 'Active'
                 elif votingEnd < time:
                     newStatus = 'Ended'
+                    answerA = Vote.query.filter_by(votingId = votingId, userAnswer = 'A').count()
+                    answerB = Vote.query.filter_by(votingId = votingId, userAnswer = 'B').count()
+                    answerC = Vote.query.filter_by(votingId = votingId, userAnswer = 'C').count()
+                    answerD = Vote.query.filter_by(votingId = votingId, userAnswer = 'D').count()
+
+                    result = Result(votingId, answerA, answerB, answerC, answerD)
+
+                    #find all votes from this voting and remove them
+                    Vote.query.filter_by(votingId = votingId).delete()
+
+                    #find all entires for user votes for this voting and remove them
+                    UserVote.query.filter_by(votingId = votingId).delete()
+
+                    db.session.add(result)
+                    db.session.commit()
                 if newStatus != '':
                     matchingVoting = Voting.query.filter_by(id = votingId).first()
                     matchingVoting.status = newStatus
