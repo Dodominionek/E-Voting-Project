@@ -670,8 +670,8 @@ if __name__ == '__main__':
 
         t3 = threading.Thread(target=check_voting_times)       
         t3.start()
-
-        app.run(debug=True, ssl_context='adhoc')
+        context = ('myCA.pem', 'myKey.key')
+        app.run(debug=True, ssl_context=context,port =443)
     except Exception as ex:
         t2.join()
         t3.join()
