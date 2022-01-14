@@ -334,26 +334,36 @@ class VotingManager(Resource):
     def get():
         try: votingId = request.args['votingId']
         except Exception as _: votingId = None
-        try: showUnvoted = request.args['showUnvoted']
+        try:
+            showUnvoted = request.args['showUnvoted']
+            if str.lower(showUnvoted) == 'true':
+                showUnvoted = True
+            else:
+                showUnvoted = False
         except Exception as _: showUnvoted = False
-        try: onlyQuestions = request.args['onlyQuestions']
+        try:
+            onlyQuestions = request.args['onlyQuestions']
+            if str.lower(onlyQuestions) == 'true':
+                onlyQuestions = True
+            else:
+                onlyQuestions = False
         except Exception as _: onlyQuestions = False
         
         if not votingId:
-            if showUnvoted:
+            if showUnvoted == True:
                 user = User.query.filter_by(id = get_jwt_identity()).first()
 
-                if onlyQuestions:    
+                if onlyQuestions == True:    
                     voted = Voting.query.with_entities(Voting.id, Voting.question) \
                                         .join(UserVote, Voting.id == UserVote.votingId) \
                                         .filter_by(userId = user.id).all()
-                    all_votings = Voting.query.with_entities(Voting.id, Voting.question).filter_by(status = 'Created').all()
+                    all_votings = Voting.query.with_entities(Voting.id, Voting.question).filter_by(status = 'Active').all()
                 else:
                     voted = Voting.query.with_entities(Voting.id, Voting.question) \
                                         .join(UserVote, Voting.id == UserVote.votingId) \
                                         .filter_by(userId = user.id).all()
                     all_votings = Voting.query.with_entities(Voting.id, Voting.question, Voting.answerA, Voting.answerB, Voting.answerC, Voting.answerD, Voting.status, Voting.timeStart, Voting.timeEnd) \
-                                        .filter_by(status = 'Created').all()
+                                        .filter_by(status = 'Active').all()
 
                 for voting1 in voted:
                     for voting2 in all_votings[:]:
@@ -364,7 +374,7 @@ class VotingManager(Resource):
                 return make_response(jsonify(votings_schema.dump(all_votings)), 200)
 
             #show all voting ids and question
-            if onlyQuestions:
+            if onlyQuestions == True:
                 votings = Voting.query.with_entities(Voting.id, Voting.question).all()
             else:
                 votings = Voting.query.with_entities(Voting.id, Voting.question, Voting.answerA, Voting.answerB, Voting.answerC, Voting.answerD, Voting.status, Voting.timeStart, Voting.timeEnd).all()
@@ -396,9 +406,12 @@ class VotingManager(Resource):
 
         if voting == None:
             return make_response(jsonify({ 'Message': 'No such voting.' }), 404)
+        
+        if voting.status == 'Ended':
+            return make_response(jsonify({ 'Message': 'Voting already ended' }), 403)
 
         #ends voting on user demand
-        if endVoting:
+        if endVoting == True:
             voting.status = 'Ended'
             answerA = Vote.query.filter_by(votingId = votingId, userAnswer = 'A').count()
             answerB = Vote.query.filter_by(votingId = votingId, userAnswer = 'B').count()
@@ -409,9 +422,6 @@ class VotingManager(Resource):
 
             #find all votes from this voting and remove them
             Vote.query.filter_by(votingId = votingId).delete()
-
-            #find all entires for user votes for this voting and remove them
-            UserVote.query.filter_by(votingId = votingId).delete()
 
             db.session.add(result)
             db.session.commit()
@@ -448,8 +458,11 @@ class VotingManager(Resource):
         if user == None:
             return make_response(jsonify({ 'Message': 'User not exist!' }), 404)
 
-        voting = Voting(question, user.id, answerA, answerB, answerC, answerD, 'Created', timeStart, timeEnd)
-
+        if timeStart == '':
+            voting = Voting(question, user.id, answerA, answerB, answerC, answerD, 'Active', timeStart, timeEnd)
+        else:
+            voting = Voting(question, user.id, answerA, answerB, answerC, answerD, 'Created', timeStart, timeEnd)
+        
         db.session.add(voting)
         db.session.commit()
         return make_response(jsonify({'Message': f'New Voting {question} created.', 'id': voting.id}), 201)
@@ -491,13 +504,20 @@ class ResultManager(Resource):
     def get():
         try: votingId = request.args['votingId']
         except Exception as _: votingId = None
-        try: showVoted = request.args['showVoted']
+        try:
+            showVoted = request.args['showVoted']
+            if str.lower(showVoted) == 'true':
+                showVoted = True
+            else:
+                showVoted = False
         except Exception as _: showVoted = False
+
+        
         
         if not votingId:
-            if showVoted:
+            if showVoted == True:
                 user = User.query.filter_by(id = get_jwt_identity()).first()
-
+                print(type(showVoted))
                 voted = Result.query.join(UserVote, Result.votingId == UserVote.votingId) \
                                     .filter_by(userId = user.id).all()
 
@@ -519,14 +539,18 @@ class VoteManager(Resource):
     @staticmethod
     @jwt_required()
     def post():
-        voteTime = datetime.now()
+        #voteTime = datetime.now()
 
         try:
             votingId = request.json['votingId']
-            userAnswer = request.json['userAnswer']
         except Exception as _:
             votingId = None
+
+        try:
+            userAnswer = request.json['userAnswer']
+        except Exception as _:
             userAnswer = None
+
         
         if None not in [votingId, userAnswer]:
             voting =  Voting.query.filter_by(id = votingId).first()
@@ -536,16 +560,16 @@ class VoteManager(Resource):
             if voting.status == 'Ended':
                 return make_response(jsonify({'Message': f'Voting {votingId} has ended. No more votes can be casted'}), 403)
 
-            try:
-                votingStart = datetime.strptime(voting.timeStart, '%Y-%m-%d %H:%M:%S.%f')
-                votingEnd = datetime.strptime(voting.timeEnd, '%Y-%m-%d %H:%M:%S.%f')
-            except Exception as _:
-                votingStart = None
-                votingEnd = None
+            # try:
+            #     votingStart = datetime.strptime(voting.timeStart, '%Y-%m-%d %H:%M:%S.%f')
+            #     votingEnd = datetime.strptime(voting.timeEnd, '%Y-%m-%d %H:%M:%S.%f')
+            # except Exception as _:
+            #     votingStart = None
+            #     votingEnd = None
 
-            print(voteTime)
-            print(votingStart)
-            print(votingEnd)
+            # print(voteTime)
+            # print(votingStart)
+            # print(votingEnd)
             
 
             if voting != None and userAnswer != None:
@@ -555,14 +579,12 @@ class VoteManager(Resource):
                 if user_vote != None:
                     return make_response(jsonify({'Message': 'User already voted in this voting.'}), 403)
 
-                if votingStart != None:
-                    if voteTime < votingStart and votingStart != "":
-                        return make_response(jsonify({'Message': 'Voting has not started yet.'}), 403)
-                if votingEnd != None:
-                    if voteTime > votingEnd:
-                        return make_response(jsonify({'Message': 'Voting time is already over.'}), 403)
+                if voting.status == 'Created':
+                    return make_response(jsonify({'Message': 'Voting has not started yet.'}), 403)
 
-                #TODO przy zakończeniu głosowania i podliczeniu głosów usunąć vote i userVote powiązane z tym głosowaniem
+                if voting.status == 'Ended':
+                    return make_response(jsonify({'Message': 'Voting time is already over.'}), 403)
+
                 vote = Vote(votingId, userAnswer)
                 user_vote = UserVote(votingId ,user.id)
                 db.session.add(vote)
@@ -610,11 +632,13 @@ def check_voting_times():
                 votingStart = datetime.strptime(voting.timeStart, '%Y-%m-%d %H:%M:%S.%f')
                 votingEnd = datetime.strptime(voting.timeEnd, '%Y-%m-%d %H:%M:%S.%f')
                 votingId = voting.id
-                newStatus = ''
-                if votingStart < time and votingEnd > time:
-                    newStatus = 'Active'
-                elif votingEnd < time:
-                    newStatus = 'Ended'
+                if votingStart < time and votingEnd > time and voting.status != 'Active':
+                    matchingVoting = Voting.query.filter_by(id = votingId).first()
+                    matchingVoting.status = 'Active'
+                    db.session.commit()
+                elif votingEnd < time and voting.status != 'Ended':
+                    matchingVoting = Voting.query.filter_by(id = votingId).first()
+                    matchingVoting.status = 'Ended'
                     answerA = Vote.query.filter_by(votingId = votingId, userAnswer = 'A').count()
                     answerB = Vote.query.filter_by(votingId = votingId, userAnswer = 'B').count()
                     answerC = Vote.query.filter_by(votingId = votingId, userAnswer = 'C').count()
@@ -625,19 +649,8 @@ def check_voting_times():
                     #find all votes from this voting and remove them
                     Vote.query.filter_by(votingId = votingId).delete()
 
-                    #find all entires for user votes for this voting and remove them
-                    UserVote.query.filter_by(votingId = votingId).delete()
-
                     db.session.add(result)
                     db.session.commit()
-                if newStatus != '':
-                    matchingVoting = Voting.query.filter_by(id = votingId).first()
-                    matchingVoting.status = newStatus
-                    db.session.commit()
-
-
-
-
 
 ####### Resource Mapping ##############
 
@@ -658,7 +671,7 @@ if __name__ == '__main__':
         t3 = threading.Thread(target=check_voting_times)       
         t3.start()
 
-        app.run(debug=True)
+        app.run(debug=True, ssl_context='adhoc')
     except Exception as ex:
         t2.join()
         t3.join()
