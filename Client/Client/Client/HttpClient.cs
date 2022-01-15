@@ -26,10 +26,10 @@ namespace HttpClient
             
             public static IRestResponse MakeRequest(RestRequest restRequest )
             {
-            restClient.Proxy = new WebProxy();
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.SystemDefault;
-            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
-            var result =restClient.Execute(restRequest);
+                restClient.Proxy = new WebProxy();
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.SystemDefault;
+                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+                var result =restClient.Execute(restRequest);
                 return result;
             }
            

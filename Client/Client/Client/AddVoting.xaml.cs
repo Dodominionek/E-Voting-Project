@@ -175,7 +175,7 @@ namespace Client
             var split = date.Split(" ");
             try
             {
-               // 2022-12-15
+              
                 var tempdate = split[0].Replace(".", "-");
                 var dateSplit = tempdate.Split("-");
                 startDateBox.Text = dateSplit[2] + "-" + dateSplit[1] + "-" + dateSplit[0];
@@ -193,8 +193,8 @@ namespace Client
             startTimeBox.IsEnabled = true;
         }
         private static bool CheckDate(string inputDate)
-        {
-            if (Regex.IsMatch(inputDate, @"^(([0-2][0-9]|[3[0-1])-(0[0-9]|1[0-2])-([0-9]{4}))$"))
+        { // 2022-12-15
+            if (Regex.IsMatch(inputDate, @"^(([0-9]{4})-(0[0-9]|1[0-2])-([0-2][0-9]|[3[0-1]))$"))
             {
                 return true;
             }
@@ -249,11 +249,11 @@ namespace Client
         {
             var startDate = startDateBox.Text;
             var endDate = endDateBox.Text;
-            var tmp = startDate.Split("-");
+            //var tmp = startDate.Split("-");
             //"timeStart": "2021-12-10 19:58:56.550604",
-            startDate = tmp[2] + "-" + tmp[1] + "-" + tmp[0];
-            tmp = endDate.Split("-");
-            endDate = tmp[2] + "-" + tmp[1] + "-" + tmp[0];
+            //startDate = tmp[2] + "-" + tmp[1] + "-" + tmp[0];
+            //tmp = endDate.Split("-");
+            //endDate = tmp[2] + "-" + tmp[1] + "-" + tmp[0];
             var request = new RestRequest("/voting", Method.POST);
             request.RequestFormat = RestSharp.DataFormat.Json;
             request.AddHeader("Authorization", "Bearer " + token.token);
@@ -267,11 +267,15 @@ namespace Client
             else
             {
                 MessageBox.Show("Dodano nowe głosowanie");
+                MainWindow mainWindow = new MainWindow(token, user);
+                mainWindow.Show();
+                this.Close();
+
             }
 
         }
 
-        private void returnButtonClicked(object sender, RoutedEventArgs e)
+        private void ReturnButtonClicked(object sender, RoutedEventArgs e)
         {
             MainWindow mainWindow = new MainWindow(token, user);
             mainWindow.Show();

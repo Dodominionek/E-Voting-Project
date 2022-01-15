@@ -37,6 +37,7 @@ namespace Client
         }
         void Init() {
             EnableButtons();
+            ClearVoting();
             var request = new RestRequest("/voting?username=" + user.username, Method.GET);
             request.RequestFormat = RestSharp.DataFormat.Json;
             request.AddHeader("Authorization", "Bearer " + token.token);
@@ -65,6 +66,7 @@ namespace Client
             {
                 votings.Items.Add(elem.id + ". " + elem.question);
             }
+
         }
 
         private void Vote(string answer)
@@ -93,6 +95,7 @@ namespace Client
         }
         private void DisplaySelected(object sender, SelectionChangedEventArgs e)
         {
+
             var item = (ListBox)sender;
             if(item.SelectedItem==null)
             {
@@ -147,26 +150,31 @@ namespace Client
         private void AButtonClicked(object sender, RoutedEventArgs e)
         {
             Vote("A");
+            DisableButtons();
         }
 
         private void BButtonClicked(object sender, RoutedEventArgs e)
         {
             Vote("B");
+            DisableButtons();
         }
 
         private void CButtonClicked(object sender, RoutedEventArgs e)
         {
             Vote("C");
+            DisableButtons();
         }
 
         private void DButtonClicked(object sender, RoutedEventArgs e)
         {
             Vote("D");
+            DisableButtons();
         }
 
         private void GetAvailableVotings(object sender, RoutedEventArgs e)
         {
             EnableButtons();
+            ClearVoting();
             var request = new RestRequest("/voting?showUnvoted=True", Method.GET);
             request.RequestFormat = RestSharp.DataFormat.Json;
             request.AddHeader("Authorization", "Bearer " + token.token);
@@ -201,6 +209,7 @@ namespace Client
         private void GetEndedVotings(object sender, RoutedEventArgs e)
         {
             DisableButtons();
+            ClearVoting();
             var request = new RestRequest("/voting?username=", Method.GET);
             request.RequestFormat = RestSharp.DataFormat.Json;
             request.AddHeader("Authorization", "Bearer " + token.token);
@@ -232,12 +241,12 @@ namespace Client
                 UpdateList();
             }
         }
-        private void AddResults()
+        private void AddResults() 
         {
             foreach(Voting voting in votingsList)
             {
                 var result = GetResult(voting.id);
-                voting.question = "[ZAKOŃCZONE]     "+voting.question;
+                voting.question = "[Z]"+voting.question;
                 var votes = result.answerA + result.answerB + result.answerC + result.answerD;
                 if(votes!=0)
                 {
@@ -261,6 +270,7 @@ namespace Client
         private void GetActiveVotings(object sender, RoutedEventArgs e)
         {
             EnableButtons();
+            ClearVoting();
             var request = new RestRequest("/voting?username=", Method.GET);
             request.RequestFormat = RestSharp.DataFormat.Json;
             request.AddHeader("Authorization", "Bearer " + token.token);
@@ -295,6 +305,15 @@ namespace Client
         private void GetAllVotings(object sender, RoutedEventArgs e)
         {
             Init();
+        }
+        private void ClearVoting()
+        {
+            answerA.Visibility = Visibility.Hidden;
+            answerB.Visibility = Visibility.Hidden;
+            answerC.Visibility = Visibility.Hidden;
+            answerD.Visibility = Visibility.Hidden;
+            votingDescription.Text = "";
+
         }
         private void EnableButtons()
         {
