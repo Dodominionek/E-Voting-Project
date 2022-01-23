@@ -13,13 +13,14 @@
                 <GradientStop Color="#FF9E1717" Offset="1"/>
             </LinearGradientBrush>
         </Grid.Background>
-        <Rectangle Stroke="Black" Margin="242,69,242,121" Fill="#FF9C9090"/>
+        <Rectangle Stroke="Black" Margin="242,69,242,84" Fill="#FF9C9090"/>
         <TextBox x:Name="loginBox" HorizontalAlignment="Center" Margin="0,143,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="250" Height="25" Background="#FFE0E0E0" TextAlignment="Left" FontSize="18" Visibility="Visible" Text="adam małysz"/>
         <Label Content="Zaloguj się&#xD;&#xA;" HorizontalAlignment="Center" Margin="0,74,0,0" VerticalAlignment="Top" FontSize="24"/>
-        <Button Content="Zaloguj się" HorizontalAlignment="Center" Click="Button_Click" Margin="0,252,0,0" VerticalAlignment="Top" FontSize="18"/>
+        <Button Content="Zaloguj się" HorizontalAlignment="Center" Click="Button_Click" Margin="0,237,0,0" VerticalAlignment="Top" FontSize="18" Width="172" Height="33"/>
         <PasswordBox x:Name="passBox" HorizontalAlignment="Center" Margin="0,192,0,0" VerticalAlignment="Top" Width="250" Background="#FFE0E0E0" Height="25" FontSize="18" Password="sads"/>
         <Label Content="ID" HorizontalAlignment="Left" Margin="275,119,0,0" VerticalAlignment="Top" FontSize="14"/>
         <Label Content="Hasło" HorizontalAlignment="Left" Margin="275,168,0,0" VerticalAlignment="Top" FontSize="14"/>
         <Label x:Name="incorrectLabel" Content="Dane logowania są nieprawidłowe" HorizontalAlignment="Center" Margin="0,217,0,0" VerticalAlignment="Top" Width="250" FontSize="14" Foreground="#FFAA2828" FontWeight="Normal" Visibility="Hidden"/>
+        <Button Content="Rejestracja" HorizontalAlignment="Center" Click="RegisterButtonClick" Margin="0,276,0,0" VerticalAlignment="Top" FontSize="18" Width="172" Height="33"/>
     </Grid>
 </Window>

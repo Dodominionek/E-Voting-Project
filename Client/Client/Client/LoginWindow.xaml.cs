@@ -51,5 +51,12 @@ namespace Client
             }
 
         }
+        private void RegisterButtonClick(object sender, RoutedEventArgs e)
+        {
+            RegisterWindow registerWindow = new RegisterWindow();
+            registerWindow.Show();
+            this.Close();
+        }
+
     }
 }

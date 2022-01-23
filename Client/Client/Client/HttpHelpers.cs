@@ -31,6 +31,20 @@ namespace SpecialVoting
             timeEnd = end;
         }
     }
+    public class User
+    {
+
+        public string username = "";
+        public string password = "";
+        public string email = "";
+        public User(string login, string password,string email)
+        {
+            this.username = login;
+            this.password = password;
+            this.email = email;
+    }
+        public User() { }
+    }
 }
 namespace HttpClient
 {

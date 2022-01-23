@@ -1,0 +1,23 @@
+﻿<Window x:Class="Client.RegisterWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Client"
+        mc:Ignorable="d"
+        Title="Register" Height="400" Width="600" Background="#FFEAD5BD">
+    <Grid>
+        <Label Content="Rejestracja" HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" FontSize="24"/>
+        <PasswordBox x:Name="pass" HorizontalAlignment="Center" Margin="0,159,0,0" VerticalAlignment="Top" Width="154" Height="24" FontSize="14"/>
+        <TextBox x:Name="username" HorizontalAlignment="Center" Margin="0,106,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="154" Height="26" FontSize="14"/>
+        <Label Content="Nazwa użytkownika" HorizontalAlignment="Left" Margin="223,80,0,0" VerticalAlignment="Top" FontSize="14"/>
+        <Label Content="Hasło" HorizontalAlignment="Left" Margin="223,133,0,0" VerticalAlignment="Top" FontSize="14"/>
+        <PasswordBox x:Name="repPass" HorizontalAlignment="Center" Margin="0,210,0,0" VerticalAlignment="Top" Width="154" Height="24" FontSize="14"/>
+        <Label Content="Powtórz Hasło" HorizontalAlignment="Left" Margin="223,184,0,0" VerticalAlignment="Top" FontSize="14"/>
+        <Button x:Name="returnButton" Content="Powrót" HorizontalAlignment="Left" Margin="10,329,0,0" VerticalAlignment="Top" Height="24" Width="89" Click="ReturnButton_Click" FontSize="14"/>
+        <Button x:Name="registerButton" Content="Zarejestruj się" HorizontalAlignment="Center" Margin="0,299,0,0" VerticalAlignment="Top" Height="25" Width="122" FontSize="14" Click="RegisterButton_Click"/>
+        <Label x:Name="Email" Content="E-mail" HorizontalAlignment="Left" Margin="223,234,0,0" VerticalAlignment="Top" FontSize="14"/>
+        <TextBox x:Name="email" HorizontalAlignment="Center" Margin="0,263,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="154" Height="26" FontSize="14"/>
+
+    </Grid>
+</Window>

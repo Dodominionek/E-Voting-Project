@@ -17,17 +17,6 @@ using SpecialVoting;
 using RestSharp;
 namespace Client
 {
-    /*
-     {
-    "question": "LOL2",
-    "answerA": "Gitówa",
-    "answerB": "Kozówa",
-    "answerC": "Trzecia opcja",
-    "answerD": "Tak",
-    "timeStart": "2021-12-10 19:58:56.550604",
-    "timeEnd": "2022-17-10 20:00:56.550604"
-}
-     */
     /// <summary>
     /// Logika interakcji dla klasy AddVoting.xaml
     /// </summary>
@@ -38,12 +27,12 @@ namespace Client
     public partial class AddVoting : Window
     {
         private readonly Token token = new Token();
-        private readonly User user = new User();
+        private readonly HttpClient.User user = new HttpClient.User();
         public AddVoting()
         {
             InitializeComponent();
         }
-        public AddVoting(Token token, User user)
+        public AddVoting(Token token, HttpClient.User user)
         {
             this.user = user;
             this.token = token;
@@ -194,7 +183,8 @@ namespace Client
         }
         private static bool CheckDate(string inputDate)
         { // 2022-12-15
-            if (Regex.IsMatch(inputDate, @"^(([0-9]{4})-(0[0-9]|1[0-2])-([0-2][0-9]|[3[0-1]))$"))
+            //if (Regex.IsMatch(inputDate, @"^(([0-9]{4})-(0[0-9]|1[0-2])-([0-2][0-9]|[3[0-1]))$"))
+            if (Regex.IsMatch(inputDate, @"^(([0-2][0-9]|[3[0-1]))-(0[0-9]|1[0-2])-([0-9]{4})$"))
             {
                 return true;
             }
@@ -249,11 +239,11 @@ namespace Client
         {
             var startDate = startDateBox.Text;
             var endDate = endDateBox.Text;
-            //var tmp = startDate.Split("-");
+            var tmp = startDate.Split("-");
             //"timeStart": "2021-12-10 19:58:56.550604",
-            //startDate = tmp[2] + "-" + tmp[1] + "-" + tmp[0];
-            //tmp = endDate.Split("-");
-            //endDate = tmp[2] + "-" + tmp[1] + "-" + tmp[0];
+            startDate = tmp[2] + "-" + tmp[1] + "-" + tmp[0];
+            tmp = endDate.Split("-");
+            endDate = tmp[2] + "-" + tmp[1] + "-" + tmp[0];
             var request = new RestRequest("/voting", Method.POST);
             request.RequestFormat = RestSharp.DataFormat.Json;
             request.AddHeader("Authorization", "Bearer " + token.token);
