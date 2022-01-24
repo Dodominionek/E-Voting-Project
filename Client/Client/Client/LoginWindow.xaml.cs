@@ -32,7 +32,8 @@ namespace Client
         {
             var request = new RestRequest("login",Method.POST);
             request.RequestFormat = RestSharp.DataFormat.Json;
-            var user = new User(loginBox.Text, passBox.Password);
+            var password = HttpClient.HttpClient.HashPassword(passBox.Password);
+            var user = new User(loginBox.Text, password);
             request.AddJsonBody(user);
             var response = HttpClient.HttpClient.MakeRequest(request);
             if(!response.IsSuccessful)

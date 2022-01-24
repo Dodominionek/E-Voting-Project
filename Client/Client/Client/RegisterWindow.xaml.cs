@@ -72,7 +72,8 @@ namespace Client
         {
             var request = new RestRequest("signup", Method.POST);
             request.RequestFormat = RestSharp.DataFormat.Json;
-            var user = new SpecialVoting.User(username.Text, pass.Password, email.Text) ;
+            var password = HttpClient.HttpClient.HashPassword(pass.Password);
+            var user = new SpecialVoting.User(username.Text, password, email.Text) ;
             request.AddJsonBody(user);
             var response = HttpClient.HttpClient.MakeRequest(request);
             if (!response.IsSuccessful)
