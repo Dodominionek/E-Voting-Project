@@ -384,7 +384,7 @@ class VotingManager(Resource):
             if onlyOwned == True:
                 user = User.query.filter_by(id = get_jwt_identity()).first()
 
-                owned_votings = Voting.query.with_entities(Voting.id, Voting.question) \
+                owned_votings = Voting.query.with_entities(Voting.id, Voting.question, Voting.answerA, Voting.answerB, Voting.answerC, Voting.answerD, Voting.status) \
                                         .filter_by(ownerId = user.id).all()
 
                 return make_response(jsonify(votings_schema.dump(owned_votings)), 200)
