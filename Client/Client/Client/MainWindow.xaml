@@ -26,7 +26,7 @@
         <Button x:Name="answerD" Content="Nie chcę wprowadzać podatku na żaden z wyżej wymienionych dżemów" Grid.Column="2" HorizontalAlignment="Left" Margin="10,439,0,0" VerticalAlignment="Top" Width="600" Click="DButtonClicked"/>
         <Button x:Name="activeVotings_Copy" Content="Nowe głosowanie" HorizontalAlignment="Left" Margin="499,2,0,0" VerticalAlignment="Top" Width="121" Height="22" Background="#FFF7E8D5" Click="CreateNewVoting" Grid.Column="2"/>
         <Button Content="Moje głosowania" HorizontalAlignment="Center" Margin="0,470,0,0" VerticalAlignment="Top" Width="141" Height="22" Background="#FFF7E8D5" Click="GetUsersVotings" Grid.Column="1"/>
-        <Button x:Name="endVotingButton" Content="Moje głosowania" HorizontalAlignment="Center" Margin="0,495,0,0" VerticalAlignment="Top" Width="620" Height="22" Background="#FFF7E8D5" Click="EndVoting" Grid.Column="2"/>
+        <Button x:Name="endVotingButton" Content="Zakończ głosowanie" HorizontalAlignment="Left" Margin="344,2,0,0" VerticalAlignment="Top" Width="150" Height="22" Background="#FFF7E8D5" Click="EndVoting" Grid.Column="2"/>
 
     </Grid>
 </Window>

@@ -5,6 +5,25 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security;
 
+namespace EndVoting
+{
+    public class Voting
+    {
+        public int id;
+        public bool endVoting;
+        public Voting()
+        {
+            id = 0;
+            endVoting = true;
+        }
+        public Voting(int id, bool endVoting)
+        {
+            this.id = id;
+            this.endVoting = endVoting;
+        }
+    }
+}
+
 namespace SpecialVoting
 {
     public class Voting
