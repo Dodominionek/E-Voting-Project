@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Client"
         mc:Ignorable="d"
         Title="E voting" Height="550" Width="800" Closed="Logout">
-    <Grid OpacityMask="#FFE82525" Background="#FFEAD5BD" Margin="0,0,0,-16">
+    <Grid x:Name="myVotings" OpacityMask="#FFE82525" Background="#FFEAD5BD" Margin="0,0,0,-16">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0*"/>
             <ColumnDefinition/>
@@ -25,7 +25,8 @@
         <Button x:Name="answerB" Content="Wiśniowy" Grid.Column="2" HorizontalAlignment="Left" Margin="10,389,0,0" VerticalAlignment="Top" Width="600" Click="BButtonClicked"/>
         <Button x:Name="answerD" Content="Nie chcę wprowadzać podatku na żaden z wyżej wymienionych dżemów" Grid.Column="2" HorizontalAlignment="Left" Margin="10,439,0,0" VerticalAlignment="Top" Width="600" Click="DButtonClicked"/>
         <Button x:Name="activeVotings_Copy" Content="Nowe głosowanie" HorizontalAlignment="Left" Margin="499,2,0,0" VerticalAlignment="Top" Width="121" Height="22" Background="#FFF7E8D5" Click="CreateNewVoting" Grid.Column="2"/>
-        <Button x:Name="availableVotings_Copy" Content="Moje głosowania" HorizontalAlignment="Center" Margin="0,470,0,0" VerticalAlignment="Top" Width="141" Height="22" Background="#FFF7E8D5" Click="GetUsersVotings" Grid.Column="1"/>
+        <Button Content="Moje głosowania" HorizontalAlignment="Center" Margin="0,470,0,0" VerticalAlignment="Top" Width="141" Height="22" Background="#FFF7E8D5" Click="GetUsersVotings" Grid.Column="1"/>
+        <Button x:Name="endVotingButton" Content="Moje głosowania" HorizontalAlignment="Center" Margin="0,495,0,0" VerticalAlignment="Top" Width="620" Height="22" Background="#FFF7E8D5" Click="EndVoting" Grid.Column="2"/>
 
     </Grid>
 </Window>

@@ -298,7 +298,6 @@ namespace Client
             }
             else
             {
-
                 UpdateList();
             }
         }
@@ -379,12 +378,6 @@ namespace Client
             request.AddHeader("Authorization", "Bearer " + token.token);
             var response = HttpClient.HttpClient.MakeRequest(request);
         }
-        private void GetMyVotings()
-        {
-
-            
-        }
-
         private void EndVoting(object sender, RoutedEventArgs e)
         {
 
