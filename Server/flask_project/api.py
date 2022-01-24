@@ -348,6 +348,13 @@ class VotingManager(Resource):
             else:
                 onlyQuestions = False
         except Exception as _: onlyQuestions = False
+        try:
+            onlyOwned = request.args['onlyOwned']
+            if str.lower(onlyOwned) == 'true':
+                onlyOwned = True
+            else:
+                onlyOwned = False
+        except Exception as _: onlyOwned = False
         
         if not votingId:
             if showUnvoted == True:
@@ -372,6 +379,12 @@ class VotingManager(Resource):
                             break
 
                 return make_response(jsonify(votings_schema.dump(all_votings)), 200)
+
+            if onlyOwned == True:
+                user = User.query.filter_by(id = get_jwt_identity()).first()
+
+                owned_votings = Voting.query.with_entities(Voting.id, Voting.question) \
+                                        .filter_by(ownerId = user.id).all()
 
             #show all voting ids and question
             if onlyQuestions == True:
