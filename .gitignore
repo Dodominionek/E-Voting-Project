@@ -14,6 +14,7 @@ dist/
 downloads/
 eggs/
 .eggs/
+.local/
 lib/
 lib64/
 parts/
@@ -137,3 +138,5 @@ dmypy.json
 
 # Visual Studio temp something
 .vs/
+/.vscode/launch.json
+/.vscode/tasks.json
