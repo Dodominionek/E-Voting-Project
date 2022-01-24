@@ -399,6 +399,7 @@ namespace Client
                 if (response.IsSuccessful)
                 {
                     MessageBox.Show("Pomyślnie zakończono głosowanie");
+                    endVotingButton.IsEnabled = false;
                 }
                 else
                 {
