@@ -289,7 +289,7 @@ namespace Client
             {
                 if (MessageBox.Show("Dane nie zostały poprawnie wczytane. Wczytać ponownie?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
                 {
-                    Init();
+                    GetActiveVotings(sender, e);
                 }
                 else
                 {
@@ -334,6 +334,60 @@ namespace Client
             AddVoting addVoting = new AddVoting(token, user);
             addVoting.Show();
             this.Close();
+        }
+
+        private void GetUsersVotings(object sender, RoutedEventArgs e)
+        {
+            
+            ClearVoting();
+            var request = new RestRequest("/voting?onlyOwned=True", Method.GET);
+            request.RequestFormat = RestSharp.DataFormat.Json;
+            request.AddHeader("Authorization", "Bearer " + token.token);
+            var response = HttpClient.HttpClient.MakeRequest(request);
+            var templist = JsonConvert.DeserializeObject<List<Voting>>(response.Content);
+            //votingsList
+            votingsList.Clear();
+            foreach (Voting vote in templist)
+            {
+                if (vote.status != "Ended")
+                {
+                    votingsList.Add(vote);
+                }
+            }
+            if (!response.IsSuccessful)
+            {
+                if (MessageBox.Show("Dane nie zostały poprawnie wczytane. Wczytać ponownie?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                {
+                    GetUsersVotings(sender, e);
+                }
+                else
+                {
+                    System.Windows.Application.Current.Shutdown();
+                }
+            }
+            else
+            {
+                endVotingButton.Visibility = Visibility.Visible;
+                UpdateList();
+            }
+        }
+
+        private void Logout(object sender, EventArgs e)
+        {
+            var request = new RestRequest("/logout", Method.POST);
+            request.RequestFormat = RestSharp.DataFormat.Json;
+            request.AddHeader("Authorization", "Bearer " + token.token);
+            var response = HttpClient.HttpClient.MakeRequest(request);
+        }
+        private void GetMyVotings()
+        {
+
+            
+        }
+
+        private void EndVoting(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
