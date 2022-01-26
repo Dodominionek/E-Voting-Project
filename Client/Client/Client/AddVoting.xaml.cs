@@ -276,7 +276,7 @@ namespace Client
             var request = new RestRequest("/logout", Method.POST);
             request.RequestFormat = RestSharp.DataFormat.Json;
             request.AddHeader("Authorization", "Bearer " + token.token);
-            var response = HttpClient.HttpClient.MakeRequest(request);
+           // var response = HttpClient.HttpClient.MakeRequest(request);
         }
     }
 

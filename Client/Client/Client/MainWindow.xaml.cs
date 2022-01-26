@@ -37,6 +37,7 @@ namespace Client
         }
         void Init() {
             EnableButtons();
+            endVotingButton.Visibility = Visibility.Hidden;
             ClearVoting();
             var request = new RestRequest("/voting?username=" + user.username, Method.GET);
             request.RequestFormat = RestSharp.DataFormat.Json;
@@ -95,7 +96,7 @@ namespace Client
         }
         private void DisplaySelected(object sender, SelectionChangedEventArgs e)
         {
-
+            endVotingButton.IsEnabled = true;
             var item = (ListBox)sender;
             if(item.SelectedItem==null)
             {
@@ -173,6 +174,7 @@ namespace Client
 
         private void GetAvailableVotings(object sender, RoutedEventArgs e)
         {
+            endVotingButton.Visibility = Visibility.Hidden;
             EnableButtons();
             ClearVoting();
             var request = new RestRequest("/voting?showUnvoted=True", Method.GET);
@@ -208,6 +210,7 @@ namespace Client
         }
         private void GetEndedVotings(object sender, RoutedEventArgs e)
         {
+            endVotingButton.Visibility = Visibility.Hidden;
             DisableButtons();
             ClearVoting();
             var request = new RestRequest("/voting?username=", Method.GET);
@@ -269,6 +272,7 @@ namespace Client
         }
         private void GetActiveVotings(object sender, RoutedEventArgs e)
         {
+            endVotingButton.Visibility = Visibility.Hidden;
             EnableButtons();
             ClearVoting();
             var request = new RestRequest("/voting?username=", Method.GET);
@@ -298,12 +302,12 @@ namespace Client
             }
             else
             {
-
                 UpdateList();
             }
         }
         private void GetAllVotings(object sender, RoutedEventArgs e)
         {
+            endVotingButton.Visibility = Visibility.Hidden;
             Init();
         }
         private void ClearVoting()
@@ -313,7 +317,7 @@ namespace Client
             answerC.Visibility = Visibility.Hidden;
             answerD.Visibility = Visibility.Hidden;
             votingDescription.Text = "";
-
+            endVotingButton.IsEnabled =false;
         }
         private void EnableButtons()
         {
@@ -377,17 +381,36 @@ namespace Client
             var request = new RestRequest("/logout", Method.POST);
             request.RequestFormat = RestSharp.DataFormat.Json;
             request.AddHeader("Authorization", "Bearer " + token.token);
-            var response = HttpClient.HttpClient.MakeRequest(request);
+           // var response = HttpClient.HttpClient.MakeRequest(request);
         }
-        private void GetMyVotings()
-        {
-
-            
-        }
-
         private void EndVoting(object sender, RoutedEventArgs e)
         {
+            var request = new RestRequest("/voting", Method.PATCH);
+            request.RequestFormat = RestSharp.DataFormat.Json;
+            request.AddHeader("Authorization", "Bearer " + token.token);
 
+            try
+            {
+                var votingName = votings.SelectedItem.ToString();
+                var votingIndex = Int32.Parse(votingName.Split('.')[0]);
+                var voting = new EndVoting.Voting(votingIndex, true);
+                request.AddJsonBody(voting);
+                var response = HttpClient.HttpClient.MakeRequest(request);
+                if (response.IsSuccessful)
+                {
+                    MessageBox.Show("Pomyślnie zakończono głosowanie");
+                    endVotingButton.IsEnabled = false;
+                }
+                else
+                {
+                    MessageBox.Show("Coś poszło nie tak");
+                }
+
+            }
+            catch (Exception exc) {
+                MessageBox.Show("Coś poszło bardzo nie tak");
+            };
+            
         }
     }
 }
